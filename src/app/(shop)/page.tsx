@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Headphones, Smartphone, Laptop, Watch, Camera, Gamepad2, Sofa, Shirt, Sparkles, Dumbbell,
-  Zap, ChevronRight, Flame, ShieldCheck, Truck, RotateCcw,
+  Palette, Clock, Shirt, Leaf, Coffee, Sofa, Gift, Gem, Flame, Sparkles,
+  Zap, ChevronRight, ShieldCheck, Truck, RotateCcw,
 } from "lucide-react";
 import { CATEGORIES, FLASH_SALE, JUST_FOR_YOU } from "@/data/products";
 import { ProductCard } from "@/components/user/ProductCard";
 import { CountdownTimer } from "@/components/user/CountdownTimer";
 
-const ICONS = { Headphones, Smartphone, Laptop, Watch, Camera, Gamepad2, Sofa, Shirt, Sparkles, Dumbbell } as const;
+const ICONS = { Palette, Clock, Shirt, Leaf, Coffee, Sofa, Gift, Gem, Flame, Sparkles } as const;
 
 const SLIDES = [
   {
@@ -19,7 +19,7 @@ const SLIDES = [
     title: "Hear every detail.\nFeel every beat.",
     sub: "Studio-grade ANC headphones with 40-hour battery.",
     cta: "Shop the drop",
-    bg: "https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=1400&q=80",
+    bg: "/assets/hero-1.png",
     accent: "from-[oklch(0.3_0.08_260)]",
   },
   {
@@ -27,7 +27,7 @@ const SLIDES = [
     title: "Titanium light.\nProMotion fast.",
     sub: "Trade in your old phone and save up to $500.",
     cta: "Discover Ultra",
-    bg: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1400&q=80",
+    bg: "/assets/hero-2.png",
     accent: "from-[oklch(0.25_0.05_240)]",
   },
   {
@@ -35,7 +35,7 @@ const SLIDES = [
     title: "Built for creators.\nWired for speed.",
     sub: "M3 Pro chip · 22-hour battery · 14\" XDR display.",
     cta: "Configure yours",
-    bg: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1400&q=80",
+    bg: "/assets/hero-3.png",
     accent: "from-[oklch(0.28_0.07_30)]",
   },
 ];
@@ -115,10 +115,10 @@ function Hero() {
           </div>
           <div className="flex-1 rounded-2xl bg-foreground text-background p-5 shadow-card relative overflow-hidden">
             <div className="text-xs font-semibold uppercase tracking-wider opacity-80">New drop</div>
-            <div className="mt-1 text-2xl font-extrabold leading-tight">Watch Series 9</div>
-            <p className="mt-1 text-sm opacity-80">Smarter. Brighter. Mightier.</p>
+            <div className="mt-1 text-2xl font-extrabold leading-tight">Wellness Kit</div>
+            <p className="mt-1 text-sm opacity-80">Pure Ayurvedic Extracts.</p>
             <Link href="/product/p4" className="mt-4 inline-block rounded-lg bg-brand text-brand-foreground px-3 py-2 text-xs font-bold">Shop now</Link>
-            <Watch className="absolute -bottom-2 -right-2 opacity-20" size={100} />
+            <Leaf className="absolute -bottom-2 -right-2 opacity-20" size={100} />
           </div>
         </div>
       </div>
@@ -186,16 +186,16 @@ function BannerAds() {
     <section className="mx-auto max-w-7xl px-4 mt-12 grid md:grid-cols-2 gap-4">
       {[
         {
-          img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
-          tag: "Sport Edit",
-          title: "Performance that lasts",
-          sub: "Up to 40% off select sneakers",
+          img: "/assets/product-5.png",
+          tag: "Handicrafts",
+          title: "Craftsmanship that lasts",
+          sub: "Authentic Sri Lankan artistry",
         },
         {
-          img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=80",
-          tag: "Beauty",
-          title: "Glow up routine",
-          sub: "Build your skincare bundle and save",
+          img: "/assets/product-10.png",
+          tag: "Heritage",
+          title: "Golden Hour Glow",
+          sub: "Bring warmth to your home",
         },
       ].map((b) => (
         <motion.a

@@ -116,7 +116,7 @@ function AddProductDrawer({ open, onClose, onAdd }: { open: boolean; onClose: ()
       stock: Number(form.stock) || 10,
       sku: form.sku || `AS-${Date.now()}`,
       badge: "New",
-      images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"],
+      images: ["/assets/product-1.png"],
       description: "Brand new addition to the Aura collection.",
       specs: [{ label: "Warranty", value: "2 years" }],
     });
