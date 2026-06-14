@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -42,6 +42,8 @@ const SLIDES = [
 
 function Hero() {
   const [i, setI] = useState(0);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
   useEffect(() => {
     const t = setInterval(() => setI((p) => (p + 1) % SLIDES.length), 5000);
     return () => clearInterval(t);
@@ -49,24 +51,30 @@ function Hero() {
   const slide = SLIDES[i];
   return (
     <section className="mx-auto max-w-7xl px-4 mt-5">
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-4" onMouseLeave={() => setHoveredCategory(null)}>
         {/* Vertical categories */}
         <aside className="hidden lg:block col-span-3 rounded-2xl bg-card border border-border shadow-card p-2 h-[440px] overflow-y-auto scrollbar-hide">
           <div className="px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">Categories</div>
           {CATEGORIES.map((c) => {
             const Icon = ICONS[c.icon as keyof typeof ICONS] ?? Sparkles;
+            const isHovered = hoveredCategory === c.name;
             return (
-              <a key={c.name} href="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent hover:text-brand transition group">
-                <Icon size={16} className="text-muted-foreground group-hover:text-brand" />
+              <a 
+                key={c.name} 
+                href="#" 
+                onMouseEnter={() => setHoveredCategory(c.name)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition group ${isHovered ? 'bg-accent text-brand' : 'hover:bg-accent hover:text-brand'}`}
+              >
+                <Icon size={16} className={`group-hover:text-brand ${isHovered ? 'text-brand' : 'text-muted-foreground'}`} />
                 <span className="text-sm flex-1">{c.name}</span>
-                <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 text-brand" />
+                <ChevronRight size={14} className={`text-brand transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
               </a>
             );
           })}
         </aside>
 
-        {/* Slider */}
-        <div className="col-span-12 lg:col-span-6 relative h-[440px] rounded-2xl overflow-hidden shadow-card">
+        {/* Slider & Flyout */}
+        <div className="col-span-12 lg:col-span-6 relative h-[440px] rounded-2xl overflow-hidden shadow-card border border-border/10">
           <AnimatePresence mode="wait">
             <motion.div
               key={i}
@@ -102,10 +110,55 @@ function Hero() {
               />
             ))}
           </div>
+
+          {/* Subcategories Flyout Overlay */}
+          <AnimatePresence>
+            {hoveredCategory && (
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 z-50 bg-card/98 backdrop-blur-2xl p-8 lg:p-10 border-l border-border flex flex-col"
+              >
+                <h3 className="text-3xl font-[family-name:var(--font-serif)] font-medium mb-8 text-foreground tracking-tight">{hoveredCategory}</h3>
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-x-12 overflow-y-auto pr-4 pb-4 scrollbar-hide">
+                  {CATEGORIES.find(c => c.name === hoveredCategory)?.subcategories?.map(sub => {
+                    const isObj = typeof sub === "object";
+                    const subName = isObj ? sub.name : sub;
+                    const items = isObj ? sub.items : undefined;
+                    
+                    return (
+                      <div key={subName} className="mb-8 break-inside-avoid">
+                        <Link 
+                          href={`/products`} 
+                          className="group flex items-center justify-between text-base font-semibold text-foreground hover:text-brand transition-all duration-300 pb-2"
+                        >
+                           <span>{subName}</span>
+                           <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out text-brand">
+                             <ChevronRight size={16} />
+                           </span>
+                        </Link>
+                        {items && items.length > 0 && (
+                          <div className="flex flex-col pl-4 border-l border-border/80 ml-2 mt-2 space-y-2.5">
+                            {items.map(item => (
+                              <Link key={item} href={`/products`} className="text-[14px] text-foreground/70 hover:text-brand hover:translate-x-0.5 transition-all duration-300">
+                                {item}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Right rails */}
-        <div className="hidden lg:flex col-span-3 flex-col gap-4">
+        <div className="hidden lg:flex col-span-3 flex-col gap-4" onMouseEnter={() => setHoveredCategory(null)}>
           <div className="flex-1 rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-5 text-brand-foreground shadow-card relative overflow-hidden">
             <div className="text-xs font-semibold uppercase tracking-wider opacity-80">Members</div>
             <div className="mt-1 text-2xl font-extrabold leading-tight">Get 25% off your first order</div>
@@ -142,6 +195,45 @@ function Hero() {
 }
 
 function FlashSale() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let animationId: number;
+    
+    const scroll = () => {
+      if (!el) return;
+      el.scrollLeft += 1;
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth) {
+        el.scrollLeft = 0;
+      }
+      animationId = requestAnimationFrame(scroll);
+    };
+
+    animationId = requestAnimationFrame(scroll);
+
+    const pause = () => cancelAnimationFrame(animationId);
+    const resume = () => {
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(scroll);
+    };
+
+    el.addEventListener("mouseenter", pause);
+    el.addEventListener("mouseleave", resume);
+    el.addEventListener("touchstart", pause);
+    el.addEventListener("touchend", resume);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      el.removeEventListener("mouseenter", pause);
+      el.removeEventListener("mouseleave", resume);
+      el.removeEventListener("touchstart", pause);
+      el.removeEventListener("touchend", resume);
+    };
+  }, []);
+
   return (
     <section className="mx-auto max-w-7xl px-4 mt-12">
       <div className="rounded-3xl bg-gradient-to-br from-[oklch(0.97_0.04_50)] to-[oklch(0.93_0.06_30)] dark:from-slate-deep dark:to-background p-6 border border-border shadow-card">
@@ -166,13 +258,13 @@ function FlashSale() {
                 <motion.div initial={{ width: 0 }} animate={{ width: "50%" }} transition={{ duration: 1.2 }} className="h-full bg-gradient-brand" />
               </div>
             </div>
-            <button className="text-sm font-semibold text-brand hover:underline">Shop all →</button>
+            <Link href="/products" className="text-sm font-semibold text-brand hover:underline">Shop all →</Link>
           </div>
         </div>
-        <div className="mt-6 flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
-          {FLASH_SALE.map((p, i) => (
-            <div key={p.id} className="shrink-0 w-[200px]">
-              <ProductCard product={p} index={i} />
+        <div ref={scrollRef} className="mt-6 flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 scroll-smooth-none">
+          {[...FLASH_SALE, ...FLASH_SALE].map((p, i) => (
+            <div key={`${p.id}-${i}`} className="shrink-0 w-[200px]">
+              <ProductCard product={p} index={i % FLASH_SALE.length} />
             </div>
           ))}
         </div>
@@ -228,7 +320,7 @@ function JustForYou() {
           <h2 className="text-2xl font-extrabold tracking-tight">Just For You</h2>
           <p className="text-sm text-muted-foreground">Hand-picked recommendations based on your taste</p>
         </div>
-        <button className="text-sm font-semibold text-brand hover:underline">View all →</button>
+        <Link href="/products" className="text-sm font-semibold text-brand hover:underline">View all →</Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {JUST_FOR_YOU.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}

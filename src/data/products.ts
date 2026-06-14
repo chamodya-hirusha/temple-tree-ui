@@ -23,17 +23,44 @@ const img = (id: string, w = 800) => {
   return `/assets/product-${index}.png`;
 };
 
-export const CATEGORIES = [
-  { name: "Traditional Handicrafts", icon: "Palette" },
-  { name: "Antique & Vintage Ceylon", icon: "Clock" },
-  { name: "Handloom & Textiles", icon: "Shirt" },
-  { name: "Ayurveda & Natural Products", icon: "Leaf" },
-  { name: "Ceylon Tea Collection", icon: "Coffee" },
-  { name: "Home & Living", icon: "Sofa" },
-  { name: "Souvenirs & Gifts", icon: "Gift" },
-  { name: "Jewelry & Accessories", icon: "Gem" },
-  { name: "Village Artisan Collections", icon: "Flame" },
-  { name: "Limited Heritage Collection", icon: "Sparkles" },
+export type SubcategoryItem = {
+  name: string;
+  items?: string[];
+};
+
+export type CategoryItem = {
+  name: string;
+  icon: string;
+  subcategories: (string | SubcategoryItem)[];
+};
+
+export const CATEGORIES: CategoryItem[] = [
+  { 
+    name: "Traditional Handicrafts", 
+    icon: "Palette", 
+    subcategories: [
+      { name: "Masks", items: ["Kolam Masks", "Raksha Masks", "Sanni Masks"] }, 
+      { name: "Wooden Statues", items: ["Buddha Statues", "Elephant Carvings", "Abstract Art"] }, 
+      "Brassware"
+    ] 
+  },
+  { 
+    name: "Antique & Vintage Ceylon", 
+    icon: "Clock", 
+    subcategories: [
+      { name: "Coins", items: ["Dutch Era", "British Era", "Ancient Sinhala"] }, 
+      "Furniture", 
+      "Manuscripts"
+    ] 
+  },
+  { name: "Handloom & Textiles", icon: "Shirt", subcategories: ["Sarees", "Sarongs", "Table Runners"] },
+  { name: "Ayurveda & Natural Products", icon: "Leaf", subcategories: ["Oils", "Soaps", "Herbal Supplements"] },
+  { name: "Ceylon Tea Collection", icon: "Coffee", subcategories: ["Black Tea", "Green Tea", "White Tea"] },
+  { name: "Home & Living", icon: "Sofa", subcategories: ["Furniture", "Decor", "Kitchenware"] },
+  { name: "Souvenirs & Gifts", icon: "Gift", subcategories: ["Keychains", "Magnets", "Miniatures"] },
+  { name: "Jewelry & Accessories", icon: "Gem", subcategories: ["Rings", "Necklaces", "Bracelets"] },
+  { name: "Village Artisan Collections", icon: "Flame", subcategories: ["Pottery", "Weaving", "Woodwork"] },
+  { name: "Limited Heritage Collection", icon: "Sparkles", subcategories: ["Rare Artifacts", "Museum Replicas", "Heirlooms"] },
 ];
 
 export const PRODUCTS: Product[] = [

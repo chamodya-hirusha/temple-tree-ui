@@ -9,7 +9,7 @@ import type { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
-  const { addToCart, toggleWishlist, wishlist } = useStore();
+  const { addToCart, toggleWishlist, wishlist, setCartOpen } = useStore();
   const off = Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100);
   const liked = wishlist.includes(product.id);
   return (
@@ -18,7 +18,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.3) }}
-      className="group relative overflow-hidden rounded-2xl bg-card shadow-card border border-border/60 hover:shadow-glow hover:border-brand/40 transition-all"
+      className="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-card border border-border/60 hover:shadow-glow hover:border-brand/40 transition-all"
     >
       <Link href={`/product/${product.id}`} className="block">
         <div className="relative aspect-square overflow-hidden bg-muted">
@@ -66,7 +66,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         </div>
       </Link>
 
-      <div className="p-3">
+      <div className="flex flex-col flex-1 p-3">
         <Link href={`/product/${product.id}`}>
           <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground min-h-[2.5rem] hover:text-brand transition">
             {product.title}
@@ -76,21 +76,35 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           <span className="text-base font-bold text-brand">${product.price}</span>
           <span className="text-xs text-muted-foreground line-through">${product.comparePrice}</span>
         </div>
-        <div className="mt-1.5 flex items-center gap-2">
+        <div className="mt-1.5 flex items-center gap-2 mb-3">
           <Stars rating={product.rating} size={12} />
           <span className="text-[11px] text-muted-foreground">| {product.sold.toLocaleString()} sold</span>
         </div>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            addToCart(product);
-          }}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-foreground text-background py-2 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity hover:bg-brand"
-        >
-          <ShoppingCart size={13} />
-          Add to Cart
-        </button>
+        <div className="mt-auto flex gap-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              addToCart(product);
+            }}
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background text-foreground py-2 text-[11px] font-semibold transition hover:border-brand hover:text-brand"
+          >
+            <ShoppingCart size={13} />
+            Add to Cart
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              addToCart(product);
+              setCartOpen(true);
+            }}
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-brand text-brand-foreground py-2 text-xs font-semibold transition shadow-glow hover:bg-brand-dark"
+          >
+            <Zap size={13} />
+            Buy Now
+          </button>
+        </div>
       </div>
     </motion.div>
   );

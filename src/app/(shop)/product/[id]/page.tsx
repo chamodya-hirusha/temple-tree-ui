@@ -81,18 +81,18 @@ export default function ProductPage() {
               </span>
             </div>
 
-            <div className="mt-5 rounded-2xl bg-gradient-to-br from-accent/60 to-accent p-5">
+            <div className="mt-5 rounded-2xl bg-gradient-to-br from-accent/60 to-accent p-5 text-white">
               <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-extrabold text-brand">${product.price}</span>
-                <span className="text-lg text-muted-foreground line-through">${product.comparePrice}</span>
-                <span className="rounded-md bg-destructive/10 text-destructive px-2 py-0.5 text-xs font-bold">Save ${product.comparePrice - product.price}</span>
+                <span className="text-4xl font-extrabold">${product.price}</span>
+                <span className="text-lg opacity-80 line-through">${product.comparePrice}</span>
+                <span className="rounded-md bg-white/20 px-2 py-0.5 text-xs font-bold">Save ${product.comparePrice - product.price}</span>
               </div>
               <button
                 onClick={() => setVoucherClaimed(true)}
                 disabled={voucherClaimed}
                 className={cn(
                   "mt-3 inline-flex items-center gap-2 rounded-lg border-2 border-dashed px-3 py-2 text-xs font-bold transition",
-                  voucherClaimed ? "border-success text-success bg-success/10" : "border-brand text-brand hover:bg-brand hover:text-brand-foreground",
+                  voucherClaimed ? "border-white/50 bg-white/20" : "border-white/60 hover:bg-white hover:text-accent",
                 )}
               >
                 {voucherClaimed ? <><Check size={14} /> Voucher claimed · -${voucherSaving}</> : <>🎟️ Claim $10 OFF voucher · save ${voucherSaving} more</>}
