@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Sparkles, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 export function UserFooter() {
@@ -31,15 +32,47 @@ export function UserFooter() {
           <div key={c.t}>
             <h4 className="text-sm font-bold mb-3">{c.t}</h4>
             <ul className="space-y-2 text-sm text-background/70">
-              {c.l.map((x) => <li key={x}><a href="#" className="hover:text-brand transition">{x}</a></li>)}
+              {c.l.map((x) => {
+                const isTrack = x === "Track Order";
+                return (
+                  <li key={x}>
+                    {isTrack ? (
+                      <Link href="/track" className="hover:text-brand transition">
+                        {x}
+                      </Link>
+                    ) : (
+                      <a href="#" className="hover:text-brand transition">
+                        {x}
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}
       </div>
       <div className="border-t border-background/10">
-        <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-background/60 flex flex-wrap items-center justify-between gap-2">
-          <div>© 2026 Aura Inc. All rights reserved.</div>
-          <div>Visa · Mastercard · Amex · PayPal · Apple Pay</div>
+        <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-background/60 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span>© 2026 Aura Inc. All rights reserved.</span>
+            <span className="hidden sm:inline text-background/30">|</span>
+            <div className="flex gap-3">
+              <Link href="/privacy-policy" className="hover:text-brand transition">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-brand transition">Terms & Conditions</Link>
+              <Link href="/refund-policy" className="hover:text-brand transition">Refund Policy</Link>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div>
+              Development by{" "}
+              <span className="underline text-background/80">
+                Brain<span className="text-yellow-500 font-extrabold">t</span>isa
+              </span>
+            </div>
+            <span className="hidden sm:inline text-background/30">|</span>
+            <div>Visa · Mastercard · Amex · PayPal · Apple Pay</div>
+          </div>
         </div>
       </div>
     </footer>

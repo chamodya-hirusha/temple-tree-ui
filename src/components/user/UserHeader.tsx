@@ -7,19 +7,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, ShoppingCart, Heart, User, Globe, Phone, Truck,
   LayoutDashboard, ChevronDown, Menu, Sparkles, X,
-  Headphones, Smartphone, Laptop, Watch, Camera, Gamepad2, Sofa, Shirt, Dumbbell,
+  Coffee, Flame, Palette, Shirt, Leaf,
 } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { CATEGORIES } from "@/data/products";
 import { cn } from "@/lib/utils";
 
-const ICONS = { Headphones, Smartphone, Laptop, Watch, Camera, Gamepad2, Sofa, Shirt, Sparkles, Dumbbell } as const;
+const ICONS = { Coffee, Flame, Palette, Shirt, Leaf, Sparkles } as const;
 
 export function UserHeader() {
-  const { cart, wishlist, setCartOpen, products } = useStore();
+  const { cart, wishlist, setCartOpen, products, currency, setCurrency, formatPrice, user } = useStore();
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
   const router = useRouter();
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
@@ -37,10 +38,46 @@ export function UserHeader() {
             <span className="flex items-center gap-1.5"><Truck size={12} /> Track Order</span>
             <span className="flex items-center gap-1.5"><Sparkles size={12} /> Save more on app</span>
           </div>
-          <div className="flex items-center gap-4 ml-auto">
-            <button className="flex items-center gap-1 hover:text-brand transition">
-              <Globe size={12} /> EN / USD <ChevronDown size={10} />
-            </button>
+          <div className="flex items-center gap-4 ml-auto relative">
+            <div className="relative">
+              <button
+                onClick={() => setShowCurrencyMenu(!showCurrencyMenu)}
+                className="flex items-center gap-1.5 hover:text-brand transition font-bold"
+              >
+                <Globe size={12} /> EN / {currency} <ChevronDown size={10} />
+              </button>
+              <AnimatePresence>
+                {showCurrencyMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    className="absolute right-0 mt-2 w-32 rounded-xl bg-card border border-border shadow-soft p-1.5 z-50 text-foreground"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => { setCurrency("USD"); setShowCurrencyMenu(false); }}
+                      className={cn(
+                        "w-full text-left px-3 py-2 text-xs font-bold rounded-lg hover:bg-muted/70",
+                        currency === "USD" ? "text-brand" : "text-muted-foreground"
+                      )}
+                    >
+                      USD ($)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setCurrency("LKR"); setShowCurrencyMenu(false); }}
+                      className={cn(
+                        "w-full text-left px-3 py-2 text-xs font-bold rounded-lg hover:bg-muted/70",
+                        currency === "LKR" ? "text-brand" : "text-muted-foreground"
+                      )}
+                    >
+                      LKR (Rs.)
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <Link
               href="/admin"
               className="flex items-center gap-1.5 rounded-full bg-brand text-brand-foreground px-3 py-1 font-semibold hover:opacity-90 transition"
@@ -71,7 +108,7 @@ export function UserHeader() {
               onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
               onFocus={() => setSearchOpen(true)}
               onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
-              placeholder="Search for headphones, watches, cameras…"
+              placeholder="Search for Ceylon tea, spices, handicrafts…"
               className="w-full bg-transparent px-3 py-2.5 text-sm outline-none"
             />
             <button className="bg-brand text-brand-foreground px-5 py-2.5 text-sm font-semibold hover:bg-brand-dark transition">
@@ -95,7 +132,7 @@ export function UserHeader() {
                       <img src={p.images[0]} alt={p.title} className="h-12 w-12 rounded-md object-cover" />
                       <div className="min-w-0 flex-1">
                         <div className="text-xs font-medium line-clamp-2">{p.title}</div>
-                        <div className="text-xs font-bold text-brand mt-0.5">${p.price}</div>
+                        <div className="text-xs font-bold text-brand mt-0.5">{formatPrice(p.price)}</div>
                       </div>
                     </button>
                   ))}
@@ -106,9 +143,12 @@ export function UserHeader() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-muted transition text-sm">
-            <User size={18} /> <span className="hidden lg:inline">Sign in</span>
-          </button>
+          <Link
+            href={user ? "/account" : "/login"}
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-muted transition text-sm text-foreground font-semibold"
+          >
+            <User size={18} /> <span className="hidden lg:inline">{user ? user.name.split(" ")[0] : "My Account"}</span>
+          </Link>
           <Link href="/cart" className="relative grid place-items-center h-10 w-10 rounded-lg hover:bg-muted transition">
             <Heart size={20} />
             {wishlist.length > 0 && (

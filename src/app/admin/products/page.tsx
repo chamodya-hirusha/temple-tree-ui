@@ -1,83 +1,165 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Edit3, Trash2, X, UploadCloud, Filter } from "lucide-react";
+import Link from "next/link";
+import {
+  Plus, Search, Edit3, Trash2, Filter, AlertCircle
+} from "lucide-react";
 import { useStore } from "@/context/StoreContext";
-import { CATEGORIES, type Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 
 export default function ProductsAdmin() {
-  const { products, deleteProduct, addProduct } = useStore();
+  const { products, deleteProduct } = useStore();
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
 
-  const filtered = products.filter((p) => p.title.toLowerCase().includes(query.toLowerCase()));
+  const filtered = products.filter((p) =>
+    p.title.toLowerCase().includes(query.toLowerCase()) ||
+    p.sku.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-6">
+      {/* Top Header Row */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Products</h1>
-          <p className="text-sm text-muted-foreground">{products.length} products in catalog</p>
+          <h1 className="text-3xl font-extrabold tracking-tight">Products Catalog</h1>
+          <p className="text-sm text-muted-foreground">{products.length} active listings exported globally</p>
         </div>
-        <button onClick={() => setOpen(true)} className="flex items-center gap-2 rounded-xl bg-brand text-brand-foreground px-4 py-2.5 text-sm font-bold shadow-glow hover:bg-brand-dark transition">
-          <Plus size={16} /> Add Product
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/products/import"
+            className="flex items-center gap-2 rounded-xl border border-border bg-card hover:bg-muted text-foreground px-4 py-3 text-sm font-bold transition-all duration-200"
+          >
+            Import CSV
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="flex items-center gap-2 rounded-xl bg-brand text-brand-foreground px-5 py-3 text-sm font-extrabold shadow-glow hover:bg-brand-dark transition-all duration-200"
+          >
+            <Plus size={16} /> Add New Product
+          </Link>
+        </div>
       </div>
 
+      {/* Main Listing Section */}
       <div className="rounded-2xl bg-card border border-border shadow-card overflow-hidden">
-        <div className="flex items-center gap-3 p-4 border-b border-border">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border bg-muted/20">
           <div className="relative flex-1 max-w-md">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products…" className="w-full rounded-lg bg-muted pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 ring-brand" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search products by title or SKU…"
+              className="w-full rounded-xl bg-background border border-border pl-9 pr-4 py-2.5 text-sm outline-none focus:ring-2 ring-brand transition-all"
+            />
           </div>
-          <button className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-muted">
-            <Filter size={12} /> Filter
+          <button className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold hover:bg-muted/50 transition">
+            <Filter size={12} /> Filter by Category
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-muted/40 text-[10px] uppercase tracking-wider text-muted-foreground font-bold border-b border-border">
               <tr>
-                <th className="text-left p-4 font-semibold">Product</th>
-                <th className="text-left p-4 font-semibold">SKU</th>
-                <th className="text-left p-4 font-semibold">Category</th>
-                <th className="text-right p-4 font-semibold">Price</th>
-                <th className="text-center p-4 font-semibold">Stock</th>
-                <th className="text-right p-4 font-semibold">Actions</th>
+                <th className="p-4 font-bold">Product Details</th>
+                <th className="p-4 font-bold">SKU</th>
+                <th className="p-4 font-bold">Category</th>
+                <th className="p-4 font-bold text-right">Price (LKR / USD)</th>
+                <th className="p-4 font-bold text-center">Stock Status</th>
+                <th className="p-4 font-bold text-center">Export Weight</th>
+                <th className="p-4 font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/60">
               {filtered.map((p) => (
-                <tr key={p.id} className="border-t border-border hover:bg-muted/30 transition">
-                  <td className="p-3">
-                     <div className="flex items-center gap-3">
-                       <img src={p.images[0]} alt="" className="h-12 w-12 rounded-lg object-cover" />
-                       <div className="min-w-0">
-                         <div className="font-semibold line-clamp-1">{p.title}</div>
-                         <div className="text-xs text-muted-foreground">★ {p.rating} · {p.sold.toLocaleString()} sold</div>
-                       </div>
-                     </div>
+                <tr key={p.id} className="hover:bg-muted/20 transition-all duration-150">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden border border-border/50 bg-muted/30">
+                        <img src={p.images[0]} alt="" className="h-full w-full object-cover" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center flex-wrap gap-1.5">
+                          <Link
+                            href={`/admin/products/${p.id}/edit`}
+                            className="font-bold text-foreground text-sm line-clamp-1 hover:text-brand transition"
+                          >
+                            {p.title}
+                          </Link>
+                          {p.flashSale && (
+                            <span className="shrink-0 inline-flex items-center gap-0.5 rounded bg-brand/15 text-brand px-1.5 py-0.5 text-[9px] font-extrabold uppercase border border-brand/20">
+                              ⚡ Sale
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                          <span className="font-medium text-brand">★ {p.rating}</span>
+                          <span>·</span>
+                          <span>{p.sold} sold</span>
+                        </div>
+                      </div>
+                    </div>
                   </td>
-                  <td className="p-3 font-mono text-xs">{p.sku}</td>
-                  <td className="p-3 text-xs">{p.category}</td>
-                  <td className="p-3 text-right font-bold tabular-nums">${p.price}</td>
-                  <td className="p-3 text-center">
-                    <span className={cn(
-                      "inline-block rounded-full px-2.5 py-1 text-xs font-bold tabular-nums",
-                      p.stock < 10 ? "bg-destructive/10 text-destructive" : p.stock < 50 ? "bg-warning/15 text-warning" : "bg-success/10 text-success",
-                    )}>
-                      {p.stock} in stock
+                  <td className="p-4 font-mono text-xs text-foreground font-medium">{p.sku}</td>
+                  <td className="p-4">
+                    <span className="inline-block bg-muted/70 text-muted-foreground px-2 py-0.5 rounded text-xs font-medium border border-border/30">
+                      {p.category}
                     </span>
                   </td>
-                  <td className="p-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <button className="grid h-8 w-8 place-items-center rounded-md hover:bg-accent text-foreground transition">
+                  <td className="p-4 text-right">
+                    {p.flashSale && p.flashSalePrice ? (
+                      <>
+                        <div className="font-bold text-brand tabular-nums">
+                          Rs. {(p.flashSalePrice * 300).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        </div>
+                        <div className="text-xs text-brand font-medium tabular-nums mt-0.5">
+                          ${p.flashSalePrice.toFixed(2)} USD <span className="text-[10px] text-muted-foreground line-through font-normal">${p.price.toFixed(2)}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-bold text-foreground tabular-nums">
+                          Rs. {p.priceLKR.toLocaleString()}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-medium tabular-nums mt-0.5">
+                          ${p.price.toFixed(2)} USD
+                        </div>
+                      </>
+                    )}
+                  </td>
+                  <td className="p-4 text-center">
+                    <span className={cn(
+                      "inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums border",
+                      p.stock === 0
+                        ? "bg-destructive/10 text-destructive border-destructive/20"
+                        : p.stock < 10
+                        ? "bg-warning/10 text-warning border-warning/20"
+                        : "bg-success/10 text-success border-success/20",
+                    )}>
+                      {p.stock === 0 ? "Out of Stock" : `${p.stock} units`}
+                    </span>
+                  </td>
+                  <td className="p-4 text-center text-xs font-semibold text-foreground">
+                    <div>{p.weight} kg</div>
+                    <div className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                      Vol: {p.volumetricWeight.toFixed(2)} kg
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <Link
+                        href={`/admin/products/${p.id}/edit`}
+                        className="grid h-9 w-9 place-items-center rounded-xl bg-muted/40 border border-border/50 hover:bg-muted text-foreground hover:text-brand transition duration-150"
+                        title="Edit Product"
+                      >
                         <Edit3 size={14} />
-                      </button>
-                      <button onClick={() => deleteProduct(p.id)} className="grid h-8 w-8 place-items-center rounded-md hover:bg-destructive/10 text-destructive transition">
+                      </Link>
+                      <button
+                        onClick={() => deleteProduct(p.id)}
+                        className="grid h-9 w-9 place-items-center rounded-xl bg-destructive/5 border border-destructive/10 hover:bg-destructive/10 text-destructive transition duration-150"
+                        title="Delete Product"
+                      >
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -88,99 +170,12 @@ export default function ProductsAdmin() {
           </table>
         </div>
         {filtered.length === 0 && (
-          <div className="p-12 text-center text-muted-foreground text-sm">No products found.</div>
+          <div className="p-16 text-center">
+            <AlertCircle size={28} className="mx-auto text-muted-foreground/60 mb-2" />
+            <div className="text-sm font-semibold text-muted-foreground">No products match your search.</div>
+          </div>
         )}
       </div>
-
-      <AddProductDrawer open={open} onClose={() => setOpen(false)} onAdd={addProduct} />
     </div>
-  );
-}
-
-function AddProductDrawer({ open, onClose, onAdd }: { open: boolean; onClose: () => void; onAdd: (p: Product) => void }) {
-  const [form, setForm] = useState({
-    title: "", sku: "", price: "", comparePrice: "", stock: "", category: CATEGORIES[0].name,
-  });
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAdd({
-      id: `p${Date.now()}`,
-      title: form.title || "New Aura Product",
-      brand: "AuraSound",
-      category: form.category,
-      price: Number(form.price) || 99,
-      comparePrice: Number(form.comparePrice) || 149,
-      rating: 5,
-      reviews: 0,
-      sold: 0,
-      stock: Number(form.stock) || 10,
-      sku: form.sku || `AS-${Date.now()}`,
-      badge: "New",
-      images: ["/assets/product-1.png"],
-      description: "Brand new addition to the Aura collection.",
-      specs: [{ label: "Warranty", value: "2 years" }],
-    });
-    setForm({ title: "", sku: "", price: "", comparePrice: "", stock: "", category: CATEGORIES[0].name });
-    onClose();
-  };
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-50 bg-slate-deep/60 backdrop-blur-sm" />
-          <motion.aside
-            initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 260 }}
-            className="fixed right-0 top-0 z-50 h-full w-full max-w-lg bg-background shadow-2xl flex flex-col"
-          >
-            <header className="p-5 border-b border-border flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold">Add New Product</h3>
-                <p className="text-xs text-muted-foreground">Fill in details to add to catalog</p>
-              </div>
-              <button onClick={onClose} className="grid h-9 w-9 place-items-center rounded-lg hover:bg-muted"><X size={18} /></button>
-            </header>
-            <form onSubmit={submit} className="flex-1 overflow-y-auto p-5 space-y-4">
-              <Input label="Product Title" value={form.title} onChange={(v) => setForm({ ...form, title: v })} placeholder="AuraSound Pro Max" required />
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="SKU" value={form.sku} onChange={(v) => setForm({ ...form, sku: v })} placeholder="AS-PRO-MAX" />
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground">Category</label>
-                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="mt-1 w-full rounded-lg border-2 border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-brand">
-                    {CATEGORIES.map((c) => <option key={c.name}>{c.name}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <Input label="Price ($)" type="number" value={form.price} onChange={(v) => setForm({ ...form, price: v })} placeholder="249" />
-                <Input label="Compare Price ($)" type="number" value={form.comparePrice} onChange={(v) => setForm({ ...form, comparePrice: v })} placeholder="399" />
-                <Input label="Inventory" type="number" value={form.stock} onChange={(v) => setForm({ ...form, stock: v })} placeholder="50" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground">Product Images</label>
-                <div className="mt-1 rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-brand transition cursor-pointer">
-                  <UploadCloud className="mx-auto mb-2 text-muted-foreground" size={28} />
-                  <div className="text-sm font-semibold">Drop images here or click to browse</div>
-                  <div className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP up to 5MB</div>
-                </div>
-              </div>
-            </form>
-            <footer className="p-5 border-t border-border flex gap-3">
-              <button type="button" onClick={onClose} className="flex-1 rounded-xl border-2 border-border py-2.5 text-sm font-semibold hover:bg-muted">Cancel</button>
-              <button type="submit" onClick={submit} className="flex-1 rounded-xl bg-brand text-brand-foreground py-2.5 text-sm font-bold hover:bg-brand-dark shadow-glow">Add Product</button>
-            </footer>
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function Input({ label, value, onChange, ...props }: { label: string; value: string; onChange: (v: string) => void } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value">) {
-  return (
-    <label className="block">
-      <span className="text-xs font-semibold text-muted-foreground">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} {...props} className="mt-1 w-full rounded-lg border-2 border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-brand transition" />
-    </label>
   );
 }

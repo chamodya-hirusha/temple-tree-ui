@@ -7,36 +7,37 @@ import {
   Palette, Clock, Shirt, Leaf, Coffee, Sofa, Gift, Gem, Flame, Sparkles,
   Zap, ChevronRight, ShieldCheck, Truck, RotateCcw,
 } from "lucide-react";
-import { CATEGORIES, FLASH_SALE, JUST_FOR_YOU } from "@/data/products";
+import { CATEGORIES, JUST_FOR_YOU } from "@/data/products";
 import { ProductCard } from "@/components/user/ProductCard";
 import { CountdownTimer } from "@/components/user/CountdownTimer";
+import { useStore } from "@/context/StoreContext";
 
 const ICONS = { Palette, Clock, Shirt, Leaf, Coffee, Sofa, Gift, Gem, Flame, Sparkles } as const;
 
 const SLIDES = [
   {
-    eyebrow: "AuraSound Pro Max",
-    title: "Hear every detail.\nFeel every beat.",
-    sub: "Studio-grade ANC headphones with 40-hour battery.",
-    cta: "Shop the drop",
+    eyebrow: "Nuwara Eliya High Grown",
+    title: "Pure Ceylon Tea\nSun-Dried & Hand-Plucked.",
+    sub: "Delicate Silver Tips and single-origin black tea directly from historical Sri Lankan tea estates.",
+    cta: "Shop Ceylon Tea",
     bg: "/assets/hero-1.png",
-    accent: "from-[oklch(0.3_0.08_260)]",
+    accent: "from-[oklch(0.35_0.07_80)]",
   },
   {
-    eyebrow: "New · AuraPhone 15 Ultra",
-    title: "Titanium light.\nProMotion fast.",
-    sub: "Trade in your old phone and save up to $500.",
-    cta: "Discover Ultra",
+    eyebrow: "Harvested in Southern Forests",
+    title: "Organic Spices\nPure & Nutrient-Rich.",
+    sub: "High-grade Ceylon Cinnamon, Green Cardamom, and organic Cloves sourced from family gardens in Matara.",
+    cta: "Shop Spice Rack",
     bg: "/assets/hero-2.png",
-    accent: "from-[oklch(0.25_0.05_240)]",
+    accent: "from-[oklch(0.32_0.08_45)]",
   },
   {
-    eyebrow: "AuraBook Pro 14",
-    title: "Built for creators.\nWired for speed.",
-    sub: "M3 Pro chip · 22-hour battery · 14\" XDR display.",
-    cta: "Configure yours",
+    eyebrow: "Ambalangoda Heritage Crafts",
+    title: "Artisan Handicrafts\nCarved entirely by Hand.",
+    sub: "Explore hand-painted Yaka masks, wooden elephants, and traditional brass oil lamps from local heritage artists.",
+    cta: "Explore Handicrafts",
     bg: "/assets/hero-3.png",
-    accent: "from-[oklch(0.28_0.07_30)]",
+    accent: "from-[oklch(0.28_0.06_35)]",
   },
 ];
 
@@ -195,11 +196,13 @@ function Hero() {
 }
 
 function FlashSale() {
+  const { products, flashSaleActive, flashSaleProgress } = useStore();
+  const flashSaleProducts = products.filter((p) => p.flashSale);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
+    if (!el || !flashSaleActive) return;
 
     let animationId: number;
     
@@ -232,7 +235,9 @@ function FlashSale() {
       el.removeEventListener("touchstart", pause);
       el.removeEventListener("touchend", resume);
     };
-  }, []);
+  }, [flashSaleActive]);
+
+  if (!flashSaleActive) return null;
 
   return (
     <section className="mx-auto max-w-7xl px-4 mt-12">
@@ -251,22 +256,28 @@ function FlashSale() {
           <div className="flex items-center gap-4">
             <div className="hidden sm:block w-48">
               <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span>50% items sold</span>
-                <span className="text-brand">Selling fast</span>
+                <span>{flashSaleProgress}% items sold</span>
+                <span className="text-brand">
+                  {flashSaleProgress >= 80 ? "Almost sold out!" : flashSaleProgress >= 50 ? "Selling fast" : "Trending"}
+                </span>
               </div>
               <div className="h-2 rounded-full bg-background overflow-hidden">
-                <motion.div initial={{ width: 0 }} animate={{ width: "50%" }} transition={{ duration: 1.2 }} className="h-full bg-gradient-brand" />
+                <motion.div initial={{ width: 0 }} animate={{ width: `${flashSaleProgress}%` }} transition={{ duration: 0.5 }} className="h-full bg-gradient-brand" />
               </div>
             </div>
             <Link href="/products" className="text-sm font-semibold text-brand hover:underline">Shop all →</Link>
           </div>
         </div>
         <div ref={scrollRef} className="mt-6 flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 scroll-smooth-none">
-          {[...FLASH_SALE, ...FLASH_SALE].map((p, i) => (
-            <div key={`${p.id}-${i}`} className="shrink-0 w-[200px]">
-              <ProductCard product={p} index={i % FLASH_SALE.length} />
-            </div>
-          ))}
+          {flashSaleProducts.length > 0 ? (
+            [...flashSaleProducts, ...flashSaleProducts].map((p, i) => (
+              <div key={`${p.id}-${i}`} className="shrink-0 w-[200px]">
+                <ProductCard product={p} index={i % (flashSaleProducts.length || 1)} />
+              </div>
+            ))
+          ) : (
+            <div className="text-xs text-muted-foreground py-6 text-center w-full">No products currently in flash sale</div>
+          )}
         </div>
       </div>
     </section>
@@ -280,14 +291,14 @@ function BannerAds() {
         {
           img: "/assets/product-5.png",
           tag: "Handicrafts",
-          title: "Craftsmanship that lasts",
-          sub: "Authentic Sri Lankan artistry",
+          title: "Heritage Wood & Brass",
+          sub: "Authentic carvings by generational island artisans",
         },
         {
           img: "/assets/product-10.png",
-          tag: "Heritage",
-          title: "Golden Hour Glow",
-          sub: "Bring warmth to your home",
+          tag: "Ceylon Tea",
+          title: "Imperial Silver Tips",
+          sub: "Single-origin luxury tea placked in Nuwara Eliya hills",
         },
       ].map((b) => (
         <motion.a

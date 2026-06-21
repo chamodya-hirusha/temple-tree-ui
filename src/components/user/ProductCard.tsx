@@ -9,8 +9,11 @@ import type { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
-  const { addToCart, toggleWishlist, wishlist, setCartOpen } = useStore();
-  const off = Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100);
+  const { addToCart, toggleWishlist, wishlist, setCartOpen, formatPrice } = useStore();
+  const onSale = product.flashSale && product.flashSalePrice;
+  const activePrice = onSale ? product.flashSalePrice! : product.price;
+  const comparePrice = onSale ? product.price : product.comparePrice;
+  const off = Math.round(((comparePrice - activePrice) / comparePrice) * 100);
   const liked = wishlist.includes(product.id);
   return (
     <motion.div
@@ -28,7 +31,12 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <div className="absolute top-2 left-2 flex flex-col gap-1 text-foreground">
+            {onSale && (
+              <span className="rounded-md bg-gradient-brand text-brand-foreground px-2 py-0.5 text-[9px] font-extrabold uppercase flex items-center gap-0.5 shadow-sm">
+                ⚡ Sale
+              </span>
+            )}
             {off > 0 && (
               <span className="rounded-md bg-destructive px-2 py-0.5 text-[10px] font-bold text-destructive-foreground">
                 -{off}%
@@ -73,8 +81,8 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           </h3>
         </Link>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-base font-bold text-brand">${product.price}</span>
-          <span className="text-xs text-muted-foreground line-through">${product.comparePrice}</span>
+          <span className="text-base font-bold text-brand">{formatPrice(activePrice)}</span>
+          <span className="text-xs text-muted-foreground line-through">{formatPrice(comparePrice)}</span>
         </div>
         <div className="mt-1.5 flex items-center gap-2 mb-3">
           <Stars rating={product.rating} size={12} />

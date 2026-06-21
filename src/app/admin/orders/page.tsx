@@ -2,29 +2,52 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, Mail, Calendar } from "lucide-react";
+import { X, MapPin, Mail, Calendar, Eye, FileText, Landmark, CreditCard, Truck } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
-import { type Order } from "@/data/products";
+import { type Order, type OrderStatus } from "@/data/products";
 import { cn } from "@/lib/utils";
+import { CustomDropdown } from "@/components/CustomDropdown";
+
+const STATUS_OPTIONS = [
+  { value: "Pending", label: "Pending" },
+  { value: "Shipped", label: "Shipped" },
+  { value: "Delivered", label: "Delivered" },
+  { value: "Cancelled", label: "Cancelled" },
+];
 
 const TABS = ["All", "Pending", "Shipped", "Delivered", "Cancelled"] as const;
 
 export default function OrdersAdmin() {
-  const { orders } = useStore();
+  const { orders, updateOrderStatus } = useStore();
   const [tab, setTab] = useState<(typeof TABS)[number]>("All");
-  const [selected, setSelected] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [slipOrder, setSlipOrder] = useState<Order | null>(null);
 
   const filtered = tab === "All" ? orders : orders.filter((o) => o.status === tab);
 
+  // Status updates handler
+  const handleStatusChange = (orderId: string, status: OrderStatus) => {
+    updateOrderStatus(orderId, status);
+    // If the active modal is showing this order, update it in local state view
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder((prev) => prev ? { ...prev, status } : null);
+    }
+  };
+
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">Orders</h1>
-        <p className="text-sm text-muted-foreground">{orders.length} total orders</p>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight">Orders Management</h1>
+          <p className="text-sm text-muted-foreground">{orders.length} total orders from domestic & overseas markets</p>
+        </div>
       </div>
 
+      {/* Filter Tabs and Table */}
       <div className="rounded-2xl bg-card border border-border shadow-card overflow-hidden">
-        <div className="flex flex-wrap gap-1 p-3 border-b border-border">
+        {/* Tabs Bar */}
+        <div className="flex flex-wrap gap-1.5 p-3.5 border-b border-border bg-muted/20">
           {TABS.map((t) => {
             const count = t === "All" ? orders.length : orders.filter((o) => o.status === t).length;
             return (
@@ -32,97 +55,324 @@ export default function OrdersAdmin() {
                 key={t}
                 onClick={() => setTab(t)}
                 className={cn(
-                  "rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center gap-2",
-                  tab === t ? "bg-brand text-brand-foreground shadow-glow" : "hover:bg-muted text-muted-foreground",
+                  "rounded-xl px-4 py-2.5 text-xs font-extrabold transition-all duration-150 flex items-center gap-2 border",
+                  tab === t
+                    ? "bg-brand text-brand-foreground border-brand shadow-glow"
+                    : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground",
                 )}
               >
-                {t} <span className={cn("rounded-full px-1.5 text-[10px]", tab === t ? "bg-white/20" : "bg-muted")}>{count}</span>
+                {t}
+                <span className={cn(
+                  "rounded-full px-1.5 py-0.5 text-[9px] font-extrabold tabular-nums",
+                  tab === t ? "bg-white/20 text-brand-foreground" : "bg-muted text-muted-foreground"
+                )}>
+                  {count}
+                </span>
               </button>
             );
           })}
         </div>
 
+        {/* Responsive Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-muted/40 text-[10px] uppercase tracking-wider text-muted-foreground font-bold border-b border-border">
               <tr>
-                <th className="text-left p-4 font-semibold">Order ID</th>
-                <th className="text-left p-4 font-semibold">Customer</th>
-                <th className="text-left p-4 font-semibold">Date</th>
-                <th className="text-center p-4 font-semibold">Items</th>
-                <th className="text-right p-4 font-semibold">Total</th>
-                <th className="text-center p-4 font-semibold">Status</th>
+                <th className="p-4 font-bold">Order ID</th>
+                <th className="p-4 font-bold">Customer Details</th>
+                <th className="p-4 font-bold">Destination</th>
+                <th className="p-4 font-bold">Date Placed</th>
+                <th className="p-4 font-bold text-center">Items</th>
+                <th className="p-4 font-bold text-right">Total Amount (LKR / USD)</th>
+                <th className="p-4 font-bold text-center">Payment Method</th>
+                <th className="p-4 font-bold text-center">Order Status</th>
+                <th className="p-4 font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/60">
               {filtered.map((o) => (
-                <tr key={o.id} onClick={() => setSelected(o)} className="border-t border-border hover:bg-muted/30 cursor-pointer transition">
-                  <td className="p-4 font-mono font-semibold">{o.id}</td>
+                <tr
+                  key={o.id}
+                  className="hover:bg-muted/20 transition-all duration-150 cursor-pointer"
+                  onClick={() => setSelectedOrder(o)}
+                >
+                  <td className="p-4 font-mono font-bold text-foreground text-xs">{o.id}</td>
                   <td className="p-4">
-                    <div className="font-semibold">{o.customer}</div>
-                    <div className="text-xs text-muted-foreground">{o.email}</div>
+                    <div className="font-bold text-foreground">{o.customer}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5 font-medium">{o.email}</div>
                   </td>
-                  <td className="p-4 text-xs">{o.date}</td>
-                  <td className="p-4 text-center">{o.items.length}</td>
-                  <td className="p-4 text-right font-bold tabular-nums">${o.total}</td>
-                  <td className="p-4 text-center">
-                    <span className={cn(
-                      "inline-block rounded-full px-2.5 py-1 text-xs font-bold",
-                      o.status === "Delivered" && "bg-success/10 text-success",
-                      o.status === "Pending" && "bg-warning/15 text-warning",
-                      o.status === "Shipped" && "bg-[oklch(0.55_0.18_240)]/10 text-[oklch(0.5_0.2_240)]",
-                      o.status === "Cancelled" && "bg-destructive/10 text-destructive",
-                    )}>{o.status}</span>
+                  <td className="p-4">
+                    <span className="inline-flex items-center gap-1.5 font-semibold text-foreground text-xs">
+                      {o.country}
+                    </span>
+                  </td>
+                  <td className="p-4 text-xs text-muted-foreground font-semibold">{o.date}</td>
+                  <td className="p-4 text-center font-bold tabular-nums text-foreground">{o.items.length}</td>
+                  <td className="p-4 text-right">
+                    <div className="font-bold text-foreground tabular-nums">
+                      Rs. {(o.totalLKR || (o.total * 300)).toLocaleString()}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-semibold tabular-nums mt-0.5">
+                      ${o.total.toFixed(2)} USD
+                    </div>
+                  </td>
+                  <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className={cn(
+                        "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border",
+                        o.paymentMethod === "Card" && "bg-success/5 text-success border-success/15",
+                        o.paymentMethod === "Bank Transfer" && "bg-brand/5 text-brand border-brand/20",
+                        o.paymentMethod === "COD" && "bg-slate-deep/5 text-slate-deep border-slate-deep/15",
+                      )}>
+                        {o.paymentMethod === "Card" && <CreditCard size={10} />}
+                        {o.paymentMethod === "Bank Transfer" && <Landmark size={10} />}
+                        {o.paymentMethod === "COD" && <Truck size={10} />}
+                        {o.paymentMethod}
+                      </span>
+                      {o.paymentMethod === "Bank Transfer" && o.depositSlipUrl && (
+                        <button
+                          onClick={() => setSlipOrder(o)}
+                          className="text-[10px] font-bold text-brand hover:underline hover:text-brand-dark cursor-pointer mt-1 block"
+                        >
+                          View Deposited Slip Image
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-32 mx-auto">
+                      <CustomDropdown
+                        options={STATUS_OPTIONS}
+                        selectedValue={o.status}
+                        onChange={(val) => handleStatusChange(o.id, val as OrderStatus)}
+                        className="py-0.5"
+                      />
+                    </div>
+                  </td>
+
+                  <td className="p-4 text-right">
+                    <button
+                      onClick={() => setSelectedOrder(o)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-bold hover:bg-muted/40 transition"
+                    >
+                      <Eye size={12} /> View Details
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {filtered.length === 0 && (
+          <div className="p-16 text-center text-muted-foreground text-sm font-semibold">
+            No orders found under this category filter.
+          </div>
+        )}
       </div>
 
+      {/* Order Detail Modal */}
       <AnimatePresence>
-        {selected && (
+        {selectedOrder && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelected(null)} className="fixed inset-0 z-50 bg-slate-deep/60 backdrop-blur-sm" />
             <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
-              className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-background shadow-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedOrder(null)}
+              className="fixed inset-0 z-50 bg-slate-deep/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-background border border-border shadow-2xl p-6"
             >
-              <div className="p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-xl font-extrabold">Order {selected.id}</h3>
-                    <p className="text-sm text-muted-foreground">Placed on {selected.date}</p>
+              <div className="flex items-start justify-between gap-4 border-b border-border pb-4 mb-5">
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">Order ID: {selectedOrder.id}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Placed on {selectedOrder.date}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="grid h-9 w-9 place-items-center rounded-xl hover:bg-muted text-foreground transition"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Order Info Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InfoCard
+                  I={Mail}
+                  title="Customer Info"
+                  content={`${selectedOrder.customer}\n${selectedOrder.email}`}
+                />
+                <InfoCard
+                  I={MapPin}
+                  title="International Destination"
+                  content={`${selectedOrder.address}\nCountry: ${selectedOrder.country}`}
+                />
+                <InfoCard
+                  I={Landmark}
+                  title="Payment Method"
+                  content={
+                    <div>
+                      <div className="font-semibold text-foreground">{selectedOrder.paymentMethod}</div>
+                      {selectedOrder.paymentMethod === "Bank Transfer" && selectedOrder.depositSlipUrl && (
+                        <button
+                          onClick={() => setSlipOrder(selectedOrder)}
+                          className="text-xs font-bold text-brand hover:underline mt-1 block"
+                        >
+                          View Deposited Slip Image
+                        </button>
+                      )}
+                    </div>
+                  }
+                />
+                <div className="rounded-2xl border border-border p-4 bg-muted/10">
+                  <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Status Settings
+                  </span>
+                  <div className="mt-2.5">
+                    <CustomDropdown
+                      options={STATUS_OPTIONS}
+                      selectedValue={selectedOrder.status}
+                      onChange={(val) => handleStatusChange(selectedOrder.id, val as OrderStatus)}
+                    />
                   </div>
-                  <button onClick={() => setSelected(null)} className="grid h-9 w-9 place-items-center rounded-lg hover:bg-muted"><X size={18} /></button>
-                </div>
-                <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm">
-                  <Info I={Mail} t="Customer" v={`${selected.customer}\n${selected.email}`} />
-                  <Info I={MapPin} t="Shipping Address" v={selected.address} />
-                  <Info I={Calendar} t="Status" v={selected.status} />
-                  <Info I={Calendar} t="Total" v={`$${selected.total}`} />
-                </div>
-                <div className="mt-5">
-                  <h4 className="text-sm font-bold mb-2">Items ({selected.items.length})</h4>
-                  <div className="space-y-2 rounded-xl border border-border p-3">
-                    {selected.items.map((i, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <img src={i.image} alt="" className="h-14 w-14 rounded-lg object-cover" />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold line-clamp-1">{i.title}</div>
-                          <div className="text-xs text-muted-foreground">Qty: {i.qty}</div>
-                        </div>
-                        <div className="font-bold text-brand tabular-nums">${(i.price * i.qty).toFixed(2)}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-5 flex gap-2">
-                  <button className="flex-1 rounded-xl border-2 border-border py-2.5 text-sm font-semibold hover:bg-muted">Print Invoice</button>
-                  <button className="flex-1 rounded-xl bg-brand text-brand-foreground py-2.5 text-sm font-bold hover:bg-brand-dark shadow-glow">Mark as Shipped</button>
+
                 </div>
               </div>
+
+              {/* Items List */}
+              <div className="mt-6">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2.5">
+                  Items Ordered ({selectedOrder.items.length})
+                </h4>
+                <div className="divide-y divide-border border border-border rounded-2xl overflow-hidden bg-muted/10">
+                  {selectedOrder.items.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3.5 p-3.5">
+                      <img src={item.image} alt="" className="h-14 w-14 rounded-xl object-cover border border-border/50 bg-white" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold text-foreground truncate">{item.title}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5 font-semibold">
+                          Qty: {item.qty} · ${item.price} USD
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-sm font-bold text-foreground tabular-nums">
+                          Rs. {(item.price * item.qty * 300).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-semibold tabular-nums mt-0.5">
+                          ${(item.price * item.qty).toFixed(2)} USD
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Totals Section */}
+              <div className="mt-6 border-t border-border pt-4 flex justify-between items-center bg-muted/10 p-4 rounded-2xl">
+                <div>
+                  <div className="text-xs text-muted-foreground font-bold uppercase">Estimated Gross Value</div>
+                  <div className="text-2xl font-extrabold text-brand tabular-nums mt-0.5">
+                    Rs. {(selectedOrder.totalLKR || (selectedOrder.total * 300)).toLocaleString()}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-muted-foreground font-bold uppercase">Invoice Base</div>
+                  <div className="text-lg font-bold text-foreground tabular-nums mt-0.5">
+                    ${selectedOrder.total.toFixed(2)} USD
+                  </div>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="flex-1 rounded-xl border border-border bg-card py-3 text-xs font-bold hover:bg-muted transition"
+                >
+                  Close Window
+                </button>
+                {selectedOrder.status === "Pending" && (
+                  <button
+                    onClick={() => handleStatusChange(selectedOrder.id, "Shipped")}
+                    className="flex-1 rounded-xl bg-brand text-brand-foreground py-3 text-xs font-extrabold hover:bg-brand-dark shadow-glow transition-all"
+                  >
+                    Approve & Mark as Shipped
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Bank Transfer Deposit Slip Preview Modal */}
+      <AnimatePresence>
+        {slipOrder && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSlipOrder(null)}
+              className="fixed inset-0 z-50 bg-slate-deep/70 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-background border border-border shadow-2xl p-6 rounded-2xl"
+            >
+              <div className="flex items-start justify-between gap-3 border-b border-border pb-3.5 mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Deposited Bank Slip</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Uploaded by {slipOrder.customer} for Order {slipOrder.id}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSlipOrder(null)}
+                  className="grid h-9 w-9 place-items-center rounded-xl hover:bg-muted text-foreground transition"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Deposit Slip Image View */}
+              <div className="relative border border-border rounded-xl overflow-hidden bg-muted/30 flex justify-center items-center p-2 max-h-[50vh]">
+                <img
+                  src={slipOrder.depositSlipUrl}
+                  alt="Deposit Slip Mockup"
+                  className="max-w-full max-h-[45vh] object-contain rounded-lg shadow-sm"
+                />
+              </div>
+
+              <div className="mt-4 flex gap-3.5 bg-muted/10 border border-border p-3.5 rounded-xl">
+                <Landmark size={18} className="text-brand shrink-0 mt-0.5" />
+                <div className="text-xs text-muted-foreground">
+                  <div className="font-bold text-foreground mb-0.5">Verification Instructions</div>
+                  Verify that the transaction reference and total amount of{" "}
+                  <strong className="text-brand">Rs. {(slipOrder.totalLKR || (slipOrder.total * 300)).toLocaleString()}</strong> are reflected in the 'Bank of Ceylon' vendor merchant account before changing status to 'Shipped'.
+                </div>
+              </div>
+
+              {slipOrder.status === "Pending" && (
+                <div className="mt-5 flex gap-3">
+                  <button
+                    onClick={() => {
+                      handleStatusChange(slipOrder.id, "Shipped");
+                      setSlipOrder(null);
+                    }}
+                    className="flex-1 rounded-xl bg-brand text-brand-foreground py-3 text-xs font-extrabold hover:bg-brand-dark shadow-glow"
+                  >
+                    Confirm Deposit & Ship Order
+                  </button>
+                </div>
+              )}
             </motion.div>
           </>
         )}
@@ -131,11 +381,15 @@ export default function OrdersAdmin() {
   );
 }
 
-function Info({ I, t, v }: { I: React.ComponentType<{ size?: number; className?: string }>; t: string; v: string }) {
+function InfoCard({ I, title, content }: { I: React.ComponentType<{ size?: number; className?: string }>; title: string; content: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border p-3">
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><I size={12} /> {t}</div>
-      <div className="mt-1 text-sm font-medium whitespace-pre-line">{v}</div>
+    <div className="rounded-2xl border border-border p-4 bg-muted/5">
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        <I size={12} className="text-brand" /> {title}
+      </div>
+      <div className="mt-2 text-xs font-semibold text-foreground whitespace-pre-line leading-relaxed">
+        {content}
+      </div>
     </div>
   );
 }

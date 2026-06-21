@@ -11,24 +11,65 @@ import { useStore } from "@/context/StoreContext";
 import { Stars } from "@/components/Stars";
 import { REVIEWS } from "@/data/products";
 import { cn } from "@/lib/utils";
+import { CustomDropdown } from "@/components/CustomDropdown";
+import { toast } from "sonner";
+
+const COUNTRY_OPTIONS = [
+  { value: "US", label: "United States", icon: "🇺🇸" },
+  { value: "GB", label: "United Kingdom", icon: "🇬🇧" },
+  { value: "AU", label: "Australia", icon: "🇦🇺" },
+  { value: "SG", label: "Singapore", icon: "🇸🇬" },
+  { value: "LK", label: "Sri Lanka", icon: "🇱🇰" },
+];
 
 export default function ProductPage() {
   const params = useParams();
   const id = params.id as string;
-  const { products, addToCart, toggleWishlist, wishlist, setCartOpen } = useStore();
+  const { products, addToCart, toggleWishlist, wishlist, setCartOpen, formatPrice, coupons } = useStore();
   const product = products.find((p) => p.id === id);
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"specs" | "desc" | "reviews">("desc");
   const [voucherClaimed, setVoucherClaimed] = useState(false);
+  const [shipCountry, setShipCountry] = useState("US");
 
   if (!product) {
     notFound();
   }
 
-  const off = Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100);
+  // Find active coupons applicable to this product
+  const applicableCoupons = (coupons || []).filter((c) => {
+    const isExpired = new Date(c.expiresAt).getTime() < Date.now();
+    const isActive = c.status === "active" && !isExpired;
+    if (!isActive) return false;
+
+    if (c.applicableTo === "all") return true;
+    return c.productIds?.includes(product.id);
+  });
+
+  const getDeliveryEstimate = (country: string) => {
+    switch (country) {
+      case "US":
+        return "Ships within 24 hours. Estimated delivery to United States: 3-5 business days via DHL Express.";
+      case "GB":
+        return "Ships within 24 hours. Estimated delivery to United Kingdom: 3-5 business days via DHL Express.";
+      case "AU":
+        return "Ships within 24 hours. Estimated delivery to Australia: 4-6 business days via FedEx Global.";
+      case "SG":
+        return "Ships within 24 hours. Estimated delivery to Singapore: 2-3 business days via DHL Express.";
+      case "LK":
+        return "Ships within 24 hours. Estimated delivery inside Sri Lanka: 1-2 business days via Domex Local Courier.";
+      default:
+        return "Ships within 24 hours. Estimated delivery: 3-5 business days via DHL Express.";
+    }
+  };
+
+  const onSale = product.flashSale && product.flashSalePrice;
+  const activePrice = onSale ? product.flashSalePrice! : product.price;
+  const comparePrice = onSale ? product.price : product.comparePrice;
+  const off = Math.round(((comparePrice - activePrice) / comparePrice) * 100);
   const liked = wishlist.includes(product.id);
-  const voucherSaving = Math.round(product.price * 0.1);
+  const voucherSaving = Math.round(activePrice * 0.1);
 
   return (
     <div className="bg-muted/40 pb-12">
@@ -83,9 +124,9 @@ export default function ProductPage() {
 
             <div className="mt-5 rounded-2xl bg-gradient-to-br from-accent/60 to-accent p-5 text-white">
               <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-extrabold">${product.price}</span>
-                <span className="text-lg opacity-80 line-through">${product.comparePrice}</span>
-                <span className="rounded-md bg-white/20 px-2 py-0.5 text-xs font-bold">Save ${product.comparePrice - product.price}</span>
+                <span className="text-4xl font-extrabold">{formatPrice(activePrice)}</span>
+                <span className="text-lg opacity-80 line-through">{formatPrice(comparePrice)}</span>
+                <span className="rounded-md bg-white/20 px-2 py-0.5 text-xs font-bold">Save {formatPrice(comparePrice - activePrice)}</span>
               </div>
               <button
                 onClick={() => setVoucherClaimed(true)}
@@ -95,9 +136,56 @@ export default function ProductPage() {
                   voucherClaimed ? "border-white/50 bg-white/20" : "border-white/60 hover:bg-white hover:text-accent",
                 )}
               >
-                {voucherClaimed ? <><Check size={14} /> Voucher claimed · -${voucherSaving}</> : <>🎟️ Claim $10 OFF voucher · save ${voucherSaving} more</>}
+                {voucherClaimed ? <><Check size={14} /> Voucher claimed · -{formatPrice(voucherSaving)}</> : <>🎟️ Claim voucher · save {formatPrice(voucherSaving)} more</>}
               </button>
             </div>
+
+            {/* Dynamic copyable coupon alert cards */}
+            {applicableCoupons.map((coupon) => {
+              const handleCopy = () => {
+                if (typeof navigator !== "undefined" && navigator.clipboard) {
+                  navigator.clipboard.writeText(coupon.code);
+                  toast.success(`Coupon code ${coupon.code} copied to clipboard!`);
+                }
+              };
+
+              let offerDetail = "";
+              if (coupon.type === "percentage") {
+                offerDetail = `Save ${coupon.value}% on this item`;
+              } else if (coupon.type === "fixed") {
+                offerDetail = `Save $${coupon.value} on this item`;
+              } else {
+                offerDetail = "Free Shipping on this order";
+              }
+
+              if (coupon.minSpend > 0) {
+                offerDetail += ` (Min. spend $${coupon.minSpend})`;
+              }
+
+              return (
+                <div
+                  key={coupon.id}
+                  onClick={handleCopy}
+                  className="mt-4 p-4 rounded-2xl border border-brand/30 bg-brand/5 hover:bg-brand/10 transition-all cursor-pointer flex items-center justify-between gap-4 group animate-fade-in"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="text-xl shrink-0 group-hover:scale-110 transition-transform">
+                      🎟️
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-foreground">Available Offer: <span className="font-mono text-brand font-extrabold uppercase">{coupon.code}</span></div>
+                      <div className="text-[10px] text-muted-foreground font-semibold mt-0.5">{offerDetail}</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="shrink-0 rounded-lg bg-brand/15 text-brand px-3 py-1.5 text-[10px] font-bold tracking-wide uppercase group-hover:bg-brand group-hover:text-brand-foreground transition-all shadow-sm"
+                  >
+                    Copy Code
+                  </button>
+                </div>
+              );
+            })}
 
             <div className="mt-5 space-y-3">
               <div className="flex items-center gap-3">
@@ -128,6 +216,33 @@ export default function ProductPage() {
                 <Heart size={18} className={liked ? "fill-destructive text-destructive" : ""} />
               </button>
             </div>
+
+            {/* Delivery Estimator */}
+            <div className="mt-5 rounded-2xl border border-border bg-muted/20 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Truck size={14} className="text-brand" /> Global Shipping Estimator
+                </span>
+                <div className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase">Ready to Ship</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground whitespace-nowrap">Deliver to:</label>
+                <CustomDropdown
+                  options={COUNTRY_OPTIONS}
+                  selectedValue={shipCountry}
+                  onChange={setShipCountry}
+                  className="max-w-[200px]"
+                />
+              </div>
+
+              <p className="text-xs text-foreground/80 leading-relaxed font-semibold">
+                {getDeliveryEstimate(shipCountry)}
+              </p>
+            </div>
+
 
             <div className="mt-6 grid grid-cols-3 gap-3 text-xs">
               {[{ I: Truck, t: "Free Shipping" }, { I: ShieldCheck, t: "2-yr Warranty" }, { I: RotateCcw, t: "30-day Returns" }].map(({ I, t }) => (
@@ -172,11 +287,27 @@ export default function ProductPage() {
               </div>
             )}
             {tab === "specs" && (
-              <div className="grid sm:grid-cols-2 gap-2">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex justify-between border-b border-border/60 py-2.5 text-sm">
+                  <span className="text-muted-foreground font-medium">Shipping Weight</span>
+                  <span className="font-bold text-foreground">{product.weight} kg</span>
+                </div>
+                <div className="flex justify-between border-b border-border/60 py-2.5 text-sm">
+                  <span className="text-muted-foreground font-medium">Volumetric Weight</span>
+                  <span className="font-bold text-brand">{product.volumetricWeight.toFixed(3)} kg</span>
+                </div>
+                <div className="flex justify-between border-b border-border/60 py-2.5 text-sm">
+                  <span className="text-muted-foreground font-medium">Package Dimensions</span>
+                  <span className="font-bold text-foreground">{`${product.dimensions.length} x ${product.dimensions.width} x ${product.dimensions.height} cm`}</span>
+                </div>
+                <div className="flex justify-between border-b border-border/60 py-2.5 text-sm">
+                  <span className="text-muted-foreground font-medium">HS Customs Code</span>
+                  <span className="font-mono font-bold text-foreground">{product.hsCode}</span>
+                </div>
                 {product.specs.map((s) => (
-                  <div key={s.label} className="flex justify-between border-b border-border/60 py-2 text-sm">
-                    <span className="text-muted-foreground">{s.label}</span>
-                    <span className="font-semibold">{s.value}</span>
+                  <div key={s.label} className="flex justify-between border-b border-border/60 py-2.5 text-sm">
+                    <span className="text-muted-foreground font-medium">{s.label}</span>
+                    <span className="font-bold text-foreground">{s.value}</span>
                   </div>
                 ))}
               </div>

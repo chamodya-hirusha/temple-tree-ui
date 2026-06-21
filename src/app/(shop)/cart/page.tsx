@@ -6,7 +6,7 @@ import { Minus, Plus, Trash2, Tag, ShoppingBag, ArrowRight, Check } from "lucide
 import { useStore } from "@/context/StoreContext";
 
 export default function CartPage() {
-  const { cart, updateQty, removeFromCart, subtotal, discount, shipping, total, voucher, applyVoucher, removeVoucher } = useStore();
+  const { cart, updateQty, removeFromCart, subtotal, discount, shipping, total, voucher, applyVoucher, removeVoucher, formatPrice, products } = useStore();
   const [code, setCode] = useState("");
 
   return (
@@ -25,33 +25,37 @@ export default function CartPage() {
                 <Link href="/" className="mt-5 inline-block rounded-xl bg-brand text-brand-foreground px-5 py-2.5 text-sm font-bold">Continue shopping</Link>
               </div>
             )}
-            {cart.map((item) => (
-              <div key={item.product.id} className="flex gap-4 rounded-2xl bg-card border border-border p-4 shadow-card">
-                <img src={item.product.images[0]} alt={item.product.title} className="h-24 w-24 rounded-xl object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between gap-3">
-                    <div className="min-w-0">
-                      <Link href={`/product/${item.product.id}`} className="text-sm font-semibold hover:text-brand line-clamp-2">{item.product.title}</Link>
-                      <div className="mt-1 text-xs text-muted-foreground">SKU: {item.product.sku}</div>
+            {cart.map((item) => {
+              const activeProd = products.find((p) => p.id === item.product.id) || item.product;
+              const activePrice = activeProd.flashSale && activeProd.flashSalePrice ? activeProd.flashSalePrice : activeProd.price;
+              return (
+                <div key={item.product.id} className="flex gap-4 rounded-2xl bg-card border border-border p-4 shadow-card">
+                  <img src={item.product.images[0]} alt={item.product.title} className="h-24 w-24 rounded-xl object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between gap-3">
+                      <div className="min-w-0">
+                        <Link href={`/product/${item.product.id}`} className="text-sm font-semibold hover:text-brand line-clamp-2">{item.product.title}</Link>
+                        <div className="mt-1 text-xs text-muted-foreground">SKU: {item.product.sku}</div>
+                      </div>
+                      <button onClick={() => removeFromCart(item.product.id)} className="grid h-9 w-9 place-items-center rounded-lg hover:bg-destructive/10 text-destructive shrink-0">
+                        <Trash2 size={15} />
+                      </button>
                     </div>
-                    <button onClick={() => removeFromCart(item.product.id)} className="grid h-9 w-9 place-items-center rounded-lg hover:bg-destructive/10 text-destructive shrink-0">
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center rounded-xl border-2 border-border">
-                      <button onClick={() => updateQty(item.product.id, item.qty - 1)} className="grid h-9 w-9 place-items-center hover:bg-muted"><Minus size={13} /></button>
-                      <span className="w-10 text-center font-bold tabular-nums">{item.qty}</span>
-                      <button onClick={() => updateQty(item.product.id, item.qty + 1)} className="grid h-9 w-9 place-items-center hover:bg-muted"><Plus size={13} /></button>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-extrabold text-brand">${(item.product.price * item.qty).toFixed(2)}</div>
-                      <div className="text-xs text-muted-foreground">${item.product.price} each</div>
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="flex items-center rounded-xl border-2 border-border">
+                        <button onClick={() => updateQty(item.product.id, item.qty - 1)} className="grid h-9 w-9 place-items-center hover:bg-muted"><Minus size={13} /></button>
+                        <span className="w-10 text-center font-bold tabular-nums">{item.qty}</span>
+                        <button onClick={() => updateQty(item.product.id, item.qty + 1)} className="grid h-9 w-9 place-items-center hover:bg-muted"><Plus size={13} /></button>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-extrabold text-brand">{formatPrice(activePrice * item.qty)}</div>
+                        <div className="text-xs text-muted-foreground">{formatPrice(activePrice)} each</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <aside className="lg:col-span-1">
@@ -75,12 +79,12 @@ export default function CartPage() {
               </div>
 
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold">${subtotal.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span className="font-semibold text-success">-${discount.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className="font-semibold">{shipping === 0 ? "FREE" : `$${shipping}`}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold">{formatPrice(subtotal)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span className="font-semibold text-success">-{formatPrice(discount)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className="font-semibold">{shipping === 0 ? "FREE" : formatPrice(shipping)}</span></div>
                 <div className="border-t border-border pt-2 flex justify-between text-lg font-extrabold">
                   <span>Total</span>
-                  <span className="text-brand">${total.toFixed(2)}</span>
+                  <span className="text-brand">{formatPrice(total)}</span>
                 </div>
               </div>
 
