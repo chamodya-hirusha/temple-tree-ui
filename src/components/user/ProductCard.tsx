@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Heart, ShoppingCart, Truck, Zap } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
@@ -9,7 +10,8 @@ import type { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
-  const { addToCart, toggleWishlist, wishlist, setCartOpen, formatPrice } = useStore();
+  const router = useRouter();
+  const { addToCart, toggleWishlist, wishlist, formatPrice } = useStore();
   const onSale = product.flashSale && product.flashSalePrice;
   const activePrice = onSale ? product.flashSalePrice! : product.price;
   const comparePrice = onSale ? product.price : product.comparePrice;
@@ -105,7 +107,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             onClick={(e) => {
               e.preventDefault();
               addToCart(product);
-              setCartOpen(true);
+              router.push("/cart");
             }}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-brand text-brand-foreground py-2 text-xs font-semibold transition shadow-glow hover:bg-brand-dark"
           >

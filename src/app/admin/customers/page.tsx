@@ -128,7 +128,7 @@ export default function CustomersAdminPage() {
 
       {/* Support Helper */}
       <div className="text-center text-[10px] text-muted-foreground flex items-center justify-center gap-1 pt-4">
-        <HelpCircle size={10} /> Need to batch modify user privileges? Reach out to support at <a href="mailto:support@aura.com" className="text-brand font-semibold hover:underline">support@aura.com</a>
+        <HelpCircle size={10} /> Need to batch modify user privileges? Reach out to support at <a href="mailto:support@Slmalkohacom" className="text-brand font-semibold hover:underline">support@Slmalkohacom</a>
       </div>
     </div>
   );

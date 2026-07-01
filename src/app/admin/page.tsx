@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  DollarSign, ShoppingBag, AlertTriangle, Users, TrendingUp, TrendingDown, ArrowUpRight, Globe,
+  DollarSign, ShoppingBag, AlertTriangle, Users, TrendingUp, TrendingDown, ArrowUpRight, Globe, Eye,
 } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { MONTHLY_SALES } from "@/data/products";
@@ -26,6 +26,19 @@ export default function Dashboard() {
   const totalOrders = orders.length;
 
   const lowStock = products.filter((p) => p.stock > 0 && p.stock < 10).length;
+
+  // --- Analytics Data ---
+  const avgStock = products.length > 0 ? Math.round(products.reduce((acc, p) => acc + p.stock, 0) / products.length) : 0;
+  
+  const mostSoldProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 4);
+  const leastSoldProducts = [...products].sort((a, b) => a.sold - b.sold).slice(0, 4);
+  
+  const productsWithViews = products.map(p => ({
+    ...p,
+    mockViews: Math.round(p.sold * 3.4 + p.rating * 100)
+  }));
+  const mostViewedProducts = [...productsWithViews].sort((a, b) => b.mockViews - a.mockViews).slice(0, 4);
+  const totalPageViews = productsWithViews.reduce((acc, p) => acc + p.mockViews, 0) + (totalOrders * 12);
 
   const stats = [
     {
@@ -229,31 +242,77 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Top Performing Sri Lankan Products */}
-      <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-bold">Top Performing Products</h3>
-            <p className="text-xs text-muted-foreground">Most popular items in international shipments</p>
+      {/* Advanced Analytics & Insights */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        
+        {/* Most Viewed */}
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-bold flex items-center gap-2"><Eye size={16} className="text-brand" /> Most Viewed Products</h3>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Highest traffic generators</p>
+            </div>
+            <span className="text-[10px] font-bold text-brand bg-brand/10 px-2 py-1 rounded-full">{totalPageViews.toLocaleString()} Views</span>
           </div>
-          <span className="text-xs text-muted-foreground font-medium">Last 30 days</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {products.slice(0, 4).map((p) => (
-            <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-3 bg-muted/20 hover:bg-muted/40 transition">
-              <img src={p.images[0]} alt="" className="h-14 w-14 rounded-lg object-cover border border-border/55" />
-              <div className="min-w-0">
-                <div className="text-xs font-bold line-clamp-2 text-foreground">{p.title}</div>
-                <div className="text-[11px] text-brand font-extrabold mt-1">
-                  {p.sold.toLocaleString()} sold
-                </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">
-                  Stock: {p.stock > 0 ? `${p.stock} units` : <span className="text-destructive font-semibold">Out of Stock</span>}
+          <div className="space-y-3">
+            {mostViewedProducts.map((p, i) => (
+              <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-2 bg-muted/10 hover:bg-muted/40 transition">
+                <span className="text-[10px] font-bold text-muted-foreground w-3 text-center">{i + 1}</span>
+                <img src={p.images[0]} alt="" className="h-10 w-10 rounded-lg object-cover border border-border/55 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold truncate text-foreground">{p.title}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{p.mockViews.toLocaleString()} views</div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Most Sold */}
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-bold flex items-center gap-2"><TrendingUp size={16} className="text-success" /> Top Sellers</h3>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Highest conversion rate</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {mostSoldProducts.map((p, i) => (
+              <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-2 bg-muted/10 hover:bg-muted/40 transition">
+                <span className="text-[10px] font-bold text-muted-foreground w-3 text-center">{i + 1}</span>
+                <img src={p.images[0]} alt="" className="h-10 w-10 rounded-lg object-cover border border-border/55 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold truncate text-foreground">{p.title}</div>
+                  <div className="text-[10px] text-success font-bold mt-0.5">{p.sold.toLocaleString()} units sold</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Least Sold */}
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-bold flex items-center gap-2"><TrendingDown size={16} className="text-destructive" /> Needs Attention</h3>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Lowest performing items</p>
+            </div>
+            <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-1 rounded-full">Avg Stock: {avgStock}</span>
+          </div>
+          <div className="space-y-3">
+            {leastSoldProducts.map((p, i) => (
+              <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-2 bg-muted/10 hover:bg-muted/40 transition">
+                <span className="text-[10px] font-bold text-muted-foreground w-3 text-center">{i + 1}</span>
+                <img src={p.images[0]} alt="" className="h-10 w-10 rounded-lg object-cover border border-border/55 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold truncate text-foreground">{p.title}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{p.sold.toLocaleString()} units sold</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );

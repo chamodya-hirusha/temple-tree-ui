@@ -68,7 +68,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       setHsCode(product.hsCode);
       setFlashSale(!!product.flashSale);
       setFlashSalePrice(product.flashSalePrice ? String(product.flashSalePrice) : "");
-      
+
       const prodImages = product.images && product.images.length > 0 ? product.images : ["/assets/product-1.png"];
       setImages(prodImages);
       setCoverImage(prodImages[0]);
@@ -219,7 +219,7 @@ export default function ProductForm({ product }: ProductFormProps) {
     }
 
     // Rearrange images so cover photo is always first
-    const activeImages = images.length > 0 
+    const activeImages = images.length > 0
       ? (images.includes(coverImage) ? [coverImage, ...images.filter(x => x !== coverImage)] : images)
       : ["/assets/product-1.png"];
 
@@ -276,7 +276,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       addProduct({
         id: `p${Date.now()}`,
         title,
-        brand: "AuraPremium",
+        brand: "SlmalkohaPremium",
         category,
         price: Number(priceUSD),
         priceLKR: Number(priceLKR),
@@ -345,8 +345,8 @@ export default function ProductForm({ product }: ProductFormProps) {
                 step === s.stepNum
                   ? "bg-brand text-brand-foreground border-brand shadow-glow"
                   : s.valid
-                  ? "bg-card text-success border-success/30 hover:bg-muted"
-                  : "bg-card text-muted-foreground border-border hover:bg-muted"
+                    ? "bg-card text-success border-success/30 hover:bg-muted"
+                    : "bg-card text-muted-foreground border-border hover:bg-muted"
               )}
             >
               <span className="h-5 w-5 rounded-full bg-white/20 inline-flex items-center justify-center text-[10px]">
@@ -411,7 +411,7 @@ export default function ProductForm({ product }: ProductFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5 relative">
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Category</label>
-                  
+
                   {/* Custom Dropdown Trigger */}
                   <div className="relative">
                     <button
@@ -484,7 +484,7 @@ export default function ProductForm({ product }: ProductFormProps) {
               {/* Advanced Multiple Image Upload Component */}
               <div className="space-y-3">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">Product Images Gallery</label>
-                
+
                 {/* Dashed Dropzone Container */}
                 <div
                   onDragEnter={handleDrag}
@@ -550,7 +550,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                             )}
                           >
                             <img src={imgSrc} alt="" className="h-full w-full object-cover" />
-                            
+
                             {/* Sleek round check ring */}
                             <button
                               type="button"

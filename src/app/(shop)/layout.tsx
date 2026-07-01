@@ -1,6 +1,5 @@
 import { UserHeader } from "@/components/user/UserHeader";
 import { UserFooter } from "@/components/user/UserFooter";
-import { CartDrawer } from "@/components/user/CartDrawer";
 import { SupportWidget } from "@/components/user/SupportWidget";
 
 export default function ShopLayout({
@@ -13,7 +12,6 @@ export default function ShopLayout({
       <UserHeader />
       <main className="flex-1">{children}</main>
       <UserFooter />
-      <CartDrawer />
       <SupportWidget />
     </div>
   );

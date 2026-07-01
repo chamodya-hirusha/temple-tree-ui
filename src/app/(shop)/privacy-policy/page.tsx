@@ -23,7 +23,7 @@ const DEFAULT_PRIVACY: PolicyData = {
   lastUpdated: "June 21, 2026",
   badge: "Compliance & Trust",
   icon: "Shield",
-  intro: "At Aura Inc., we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, process, share, and protect your information when you visit or make a purchase from our international single-vendor e-commerce platform.",
+  intro: "At Slmalkoha Inc., we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, process, share, and protect your information when you visit or make a purchase from our international single-vendor e-commerce platform.",
   sections: [
     {
       title: "1. Information We Collect",
@@ -31,7 +31,7 @@ const DEFAULT_PRIVACY: PolicyData = {
     },
     {
       title: "2. How We Use Your Data",
-      content: "We process your information to fulfill contracts (such as delivering Ceylon tea, handicrafts, or spices to your door) and to comply with legal obligations. Specifically, your data is used to:\n\n• Process and fulfill orders, including international shipping, customs documentation, and logistics tracking.\n• Screen orders for potential risk or fraud.\n• Maintain customer accounts and loyalty profiles (such as Aura+ benefits).\n• Send order updates, tracking details, and promotional communications (where consented).",
+      content: "We process your information to fulfill contracts (such as delivering Ceylon tea, handicrafts, or spices to your door) and to comply with legal obligations. Specifically, your data is used to:\n\n• Process and fulfill orders, including international shipping, customs documentation, and logistics tracking.\n• Screen orders for potential risk or fraud.\n• Maintain customer accounts and loyalty profiles (such as Slmalkoha+ benefits).\n• Send order updates, tracking details, and promotional communications (where consented).",
     },
     {
       title: "3. International Data Transfers & Third Parties",
@@ -47,7 +47,7 @@ const DEFAULT_PRIVACY: PolicyData = {
     },
     {
       title: "6. Contact Us",
-      content: "For questions about our privacy standards, or to file a data removal request, please reach out to our Compliance Office at privacy@aura.com.",
+      content: "For questions about our privacy standards, or to file a data removal request, please reach out to our Compliance Office at privacy@Slmalkohacom.",
     },
   ],
 };
@@ -56,7 +56,7 @@ export default function PrivacyPolicyPage() {
   const [data, setData] = useState<PolicyData>(DEFAULT_PRIVACY);
 
   useEffect(() => {
-    const saved = localStorage.getItem("aura_policy_privacy");
+    const saved = localStorage.getItem("Slmalkoha_policy_privacy");
     if (saved) {
       try {
         setData(JSON.parse(saved));

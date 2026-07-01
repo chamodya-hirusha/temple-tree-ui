@@ -23,7 +23,7 @@ const DEFAULT_REFUNDS: PolicyData = {
   lastUpdated: "June 21, 2026",
   badge: "Returns & Refunds",
   icon: "RotateCcw",
-  intro: "At Aura Inc., we take pride in the quality and craftsmanship of our Sri Lankan heritage exports. If you are not entirely satisfied with your purchase, we are here to assist with our transparent global return guidelines.",
+  intro: "At Slmalkoha Inc., we take pride in the quality and craftsmanship of our Sri Lankan heritage exports. If you are not entirely satisfied with your purchase, we are here to assist with our transparent global return guidelines.",
   sections: [
     {
       title: "1. 30-Day Return Window",
@@ -47,7 +47,7 @@ const DEFAULT_REFUNDS: PolicyData = {
     },
     {
       title: "6. How to Initiate a Return",
-      content: "To begin a return, please submit your request to our support desk at support@aura.com referencing your Order Number (e.g. ORD-12345). Please do not send items back without an authorized return merchandise authorization (RMA) label.",
+      content: "To begin a return, please submit your request to our support desk at support@Slmalkohacom referencing your Order Number (e.g. ORD-12345). Please do not send items back without an authorized return merchandise authorization (RMA) label.",
     },
   ],
 };
@@ -56,7 +56,7 @@ export default function RefundPolicyPage() {
   const [data, setData] = useState<PolicyData>(DEFAULT_REFUNDS);
 
   useEffect(() => {
-    const saved = localStorage.getItem("aura_policy_refund");
+    const saved = localStorage.getItem("Slmalkoha_policy_refund");
     if (saved) {
       try {
         setData(JSON.parse(saved));

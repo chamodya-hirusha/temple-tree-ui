@@ -53,36 +53,33 @@ export default function LoginPage() {
   return (
     <div className="bg-muted/40 min-h-[80vh] py-12 px-4 flex items-center justify-center">
       <div className="w-full max-w-md space-y-6">
-        
+
         {/* Logo/Header */}
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand shadow-glow">
-              <Sparkles className="text-brand-foreground" size={18} />
-            </div>
-            <span className="text-lg font-extrabold tracking-tight text-foreground">AURA<span className="text-brand">.</span></span>
+            <span className="text-2xl font-serif font-bold tracking-wide text-foreground">Slmalkoha<span className="text-brand">.</span></span>
           </Link>
           <h2 className="text-2xl font-extrabold tracking-tight text-foreground mt-2">
             {tab === "login" ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="text-xs text-muted-foreground">
-            {tab === "login" 
-              ? "Access your Ceylon heritage items and order tracking." 
+            {tab === "login"
+              ? "Access your Ceylon heritage items and order tracking."
               : "Register to enjoy global checkout priority and local discounts."}
           </p>
         </div>
 
         {/* Auth Card */}
         <div className="bg-card border border-border rounded-3xl shadow-card overflow-hidden">
-          
+
           {/* Tabs header */}
           <div className="flex border-b border-border bg-muted/20">
             <button
               onClick={() => setTab("login")}
               className={cn(
                 "flex-1 py-4 text-xs font-extrabold uppercase tracking-wider transition-all duration-155 border-b-2",
-                tab === "login" 
-                  ? "border-brand text-brand bg-background" 
+                tab === "login"
+                  ? "border-brand text-brand bg-background"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
@@ -92,8 +89,8 @@ export default function LoginPage() {
               onClick={() => setTab("signup")}
               className={cn(
                 "flex-1 py-4 text-xs font-extrabold uppercase tracking-wider transition-all duration-155 border-b-2",
-                tab === "signup" 
-                  ? "border-brand text-brand bg-background" 
+                tab === "signup"
+                  ? "border-brand text-brand bg-background"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
@@ -125,7 +122,7 @@ export default function LoginPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="buyer@aura.com"
+                        placeholder="buyer@Slmalkohacom"
                         className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-sm outline-none focus:ring-2 ring-brand transition-all"
                         required
                       />
@@ -200,7 +197,7 @@ export default function LoginPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="buyer@aura.com"
+                        placeholder="buyer@Slmalkohacom"
                         className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-sm outline-none focus:ring-2 ring-brand transition-all"
                         required
                       />
@@ -265,7 +262,7 @@ export default function LoginPage() {
               Use the following credentials to login with fully loaded order templates:
             </p>
             <div className="mt-2.5 space-y-1 font-mono text-[10px]">
-              <div>Email: <span className="text-brand font-bold select-all">buyer@aura.com</span></div>
+              <div>Email: <span className="text-brand font-bold select-all">buyer@Slmalkohacom</span></div>
               <div>Password: <span className="text-brand font-bold select-all">password123</span></div>
             </div>
             <p className="mt-2.5 leading-relaxed text-[10px]">

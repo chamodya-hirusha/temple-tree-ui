@@ -19,6 +19,28 @@ export interface Coupon {
   productIds?: string[];
 }
 
+export type BannerAd = {
+  img: string;
+  tag: string;
+  title: string;
+  sub: string;
+};
+
+const INITIAL_BANNERS: BannerAd[] = [
+  {
+    img: "/assets/product-5.png",
+    tag: "Handicrafts",
+    title: "Heritage Wood & Brass",
+    sub: "Authentic carvings by generational island artisans",
+  },
+  {
+    img: "/assets/product-10.png",
+    tag: "Ceylon Tea",
+    title: "Imperial Silver Tips",
+    sub: "Single-origin luxury tea placked in Nuwara Eliya hills",
+  },
+];
+
 const INITIAL_COUPONS: Coupon[] = [
   {
     id: "c1",
@@ -106,6 +128,9 @@ type StoreContextType = {
   setFlashSaleProgress: (v: number) => void;
   flashSaleTime: { h: number; m: number; s: number };
   setFlashSaleTime: (time: { h: number; m: number; s: number }) => void;
+
+  banners: BannerAd[];
+  updateBanner: (index: number, patch: Partial<BannerAd>) => void;
 };
 
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -129,27 +154,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const [coupons, setCoupons] = useState<Coupon[]>([]);
 
+  const [banners, setBanners] = useState<BannerAd[]>(INITIAL_BANNERS);
+
+  const updateBanner = (index: number, patch: Partial<BannerAd>) => {
+    setBanners((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], ...patch };
+      return next;
+    });
+  };
+
   // Load coupons from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem("aura_coupons");
+    const stored = localStorage.getItem("Slmalkoha_coupons");
     if (stored) {
       try {
         setCoupons(JSON.parse(stored));
       } catch (e) {
-        console.error("Failed to parse aura_coupons", e);
+        console.error("Failed to parse Slmalkoha_coupons", e);
         setCoupons(INITIAL_COUPONS);
-        localStorage.setItem("aura_coupons", JSON.stringify(INITIAL_COUPONS));
+        localStorage.setItem("Slmalkoha_coupons", JSON.stringify(INITIAL_COUPONS));
       }
     } else {
       setCoupons(INITIAL_COUPONS);
-      localStorage.setItem("aura_coupons", JSON.stringify(INITIAL_COUPONS));
+      localStorage.setItem("Slmalkoha_coupons", JSON.stringify(INITIAL_COUPONS));
     }
   }, []);
 
   const addCoupon = (c: Coupon) => {
     setCoupons((prev) => {
       const next = [c, ...prev];
-      localStorage.setItem("aura_coupons", JSON.stringify(next));
+      localStorage.setItem("Slmalkoha_coupons", JSON.stringify(next));
       return next;
     });
   };
@@ -157,7 +192,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const deleteCoupon = (id: string) => {
     setCoupons((prev) => {
       const next = prev.filter((c) => c.id !== id);
-      localStorage.setItem("aura_coupons", JSON.stringify(next));
+      localStorage.setItem("Slmalkoha_coupons", JSON.stringify(next));
       return next;
     });
   };
@@ -188,8 +223,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [flashSaleActive]);
 
   const login = (email: string, pass: string) => {
-    if (email.trim() === "buyer@aura.com" && pass === "password123") {
-      setUser({ email: "buyer@aura.com", name: "Emily Carter" });
+    if (email.trim() === "buyer@Slmalkohacom" && pass === "password123") {
+      setUser({ email: "buyer@Slmalkohacom", name: "Emily Carter" });
       toast.success("Successfully logged in!");
       return true;
     }
@@ -298,7 +333,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const shipping = useMemo(() => {
     if (cart.length === 0) return 0;
     if (subtotal > 500) return 0;
-    
+
     // Check if free shipping voucher is applied
     if (activeCoupon && activeCoupon.type === "freeship") {
       if (activeCoupon.applicableTo === "all") {
@@ -319,15 +354,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const cleanCode = code.trim().toUpperCase();
     // Search in state coupons first
     let found = coupons.find((c) => c.code.toUpperCase() === cleanCode);
-    
+
     // If not loaded yet or state empty, fall back to check localStorage directly
     if (!found && typeof window !== "undefined") {
-      const stored = localStorage.getItem("aura_coupons");
+      const stored = localStorage.getItem("Slmalkoha_coupons");
       if (stored) {
         try {
           const list = JSON.parse(stored) as Coupon[];
           found = list.find((c) => c.code.toUpperCase() === cleanCode);
-        } catch (e) {}
+        } catch (e) { }
       }
     }
 
@@ -344,7 +379,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toast.success(`Voucher ${cleanCode} applied`);
       return true;
     }
-    
+
     toast.error("Invalid voucher code");
     return false;
   };
@@ -384,6 +419,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         flashSaleActive, setFlashSaleActive,
         flashSaleProgress, setFlashSaleProgress,
         flashSaleTime, setFlashSaleTime,
+        banners, updateBanner,
       }}
     >
       {children}

@@ -109,7 +109,7 @@ export default function BulkCSVImportPage() {
   const handleConfirmImport = () => {
     // Filter down to rows containing valid international e-commerce metrics
     const validRows = MOCK_CSV_ROWS.filter((r) => r.hsCode && r.weight > 0);
-    
+
     // Add valid products to store provider context
     validRows.forEach((row) => {
       addProduct({
@@ -145,7 +145,7 @@ export default function BulkCSVImportPage() {
 
     console.log("Imported product array:", validRows);
     toast.success(`Successfully imported ${validRows.length} valid products into the catalog! 🎉`);
-    
+
     // Reset page back to initial upload state
     setImportState("idle");
     setFileName("");
@@ -211,7 +211,7 @@ export default function BulkCSVImportPage() {
               href="#"
               onClick={(e) => {
                 e.stopPropagation();
-                toast.info("Downloading sample template... Aura_Product_Import_Template.csv");
+                toast.info("Downloading sample template... Slmalkoha_Product_Import_Template.csv");
               }}
               className="inline-flex items-center gap-1.5 text-xs text-brand font-semibold hover:underline"
             >
@@ -242,7 +242,7 @@ export default function BulkCSVImportPage() {
       {importState === "preview" && (
         <div className="space-y-6">
           <div className="rounded-3xl bg-card border border-border p-6 shadow-card space-y-4">
-            
+
             {/* Action Bar */}
             <div className="flex justify-between items-center flex-wrap gap-4 border-b border-border pb-4">
               <div>
@@ -251,7 +251,7 @@ export default function BulkCSVImportPage() {
                   File: <span className="font-semibold text-foreground">{fileName}</span> ({MOCK_CSV_ROWS.length} rows detected)
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
@@ -337,7 +337,7 @@ export default function BulkCSVImportPage() {
             </div>
 
           </div>
-          
+
           {/* Help Box */}
           <div className="text-center text-[10px] text-muted-foreground flex items-center justify-center gap-1">
             <HelpCircle size={10} /> Confused about customs parameters? Read our international shipping guidelines in the <Link href="/admin/settings" className="text-brand hover:underline font-semibold">Settings hub</Link>.

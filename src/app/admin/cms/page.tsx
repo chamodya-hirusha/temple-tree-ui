@@ -38,7 +38,7 @@ const DEFAULT_PRIVACY: PolicyData = {
   lastUpdated: "June 21, 2026",
   badge: "Compliance & Trust",
   icon: "Shield",
-  intro: "At Aura Inc., we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, process, share, and protect your information when you visit or make a purchase from our international single-vendor e-commerce platform.",
+  intro: "At Slmalkoha Inc., we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, process, share, and protect your information when you visit or make a purchase from our international single-vendor e-commerce platform.",
   sections: [
     {
       title: "1. Information We Collect",
@@ -46,7 +46,7 @@ const DEFAULT_PRIVACY: PolicyData = {
     },
     {
       title: "2. How We Use Your Data",
-      content: "We process your information to fulfill contracts (such as delivering Ceylon tea, handicrafts, or spices to your door) and to comply with legal obligations. Specifically, your data is used to:\n\n• Process and fulfill orders, including international shipping, customs documentation, and logistics tracking.\n• Screen orders for potential risk or fraud.\n• Maintain customer accounts and loyalty profiles (such as Aura+ benefits).\n• Send order updates, tracking details, and promotional communications (where consented).",
+      content: "We process your information to fulfill contracts (such as delivering Ceylon tea, handicrafts, or spices to your door) and to comply with legal obligations. Specifically, your data is used to:\n\n• Process and fulfill orders, including international shipping, customs documentation, and logistics tracking.\n• Screen orders for potential risk or fraud.\n• Maintain customer accounts and loyalty profiles (such as Slmalkoha+ benefits).\n• Send order updates, tracking details, and promotional communications (where consented).",
     },
     {
       title: "3. International Data Transfers & Third Parties",
@@ -62,7 +62,7 @@ const DEFAULT_PRIVACY: PolicyData = {
     },
     {
       title: "6. Contact Us",
-      content: "For questions about our privacy standards, or to file a data removal request, please reach out to our Compliance Office at privacy@aura.com.",
+      content: "For questions about our privacy standards, or to file a data removal request, please reach out to our Compliance Office at privacy@Slmalkohacom.",
     },
   ],
 };
@@ -72,11 +72,11 @@ const DEFAULT_TERMS: PolicyData = {
   lastUpdated: "June 21, 2026",
   badge: "Agreements & Terms",
   icon: "Scale",
-  intro: "Welcome to the Aura Inc. e-commerce platform. By accessing or purchasing from our website, you agree to be bound by the following Terms & Conditions. Please read them carefully before finalizing your orders.",
+  intro: "Welcome to the Slmalkoha Inc. e-commerce platform. By accessing or purchasing from our website, you agree to be bound by the following Terms & Conditions. Please read them carefully before finalizing your orders.",
   sections: [
     {
       title: "1. User Account & Security",
-      content: "To complete purchases and utilize member discounts (such as Aura+ benefits), you may register an account. You are responsible for keeping your credential details private. We reserve the right to close accounts or restrict access if fraud or terms violation is suspected.",
+      content: "To complete purchases and utilize member discounts (such as Slmalkoha+ benefits), you may register an account. You are responsible for keeping your credential details private. We reserve the right to close accounts or restrict access if fraud or terms violation is suspected.",
     },
     {
       title: "2. Product Pricing & Currency Conversion",
@@ -88,11 +88,11 @@ const DEFAULT_TERMS: PolicyData = {
     },
     {
       title: "4. Limitation of Liability",
-      content: "Aura Inc. is not liable for any indirect, incidental, or punitive damages resulting from your use of the store, including transit delays caused by couriers, weather disruptions, or customs clearance holds. Our total liability for any purchase shall not exceed the price paid for the specific item in question.",
+      content: "Slmalkoha Inc. is not liable for any indirect, incidental, or punitive damages resulting from your use of the store, including transit delays caused by couriers, weather disruptions, or customs clearance holds. Our total liability for any purchase shall not exceed the price paid for the specific item in question.",
     },
     {
       title: "5. Intellectual Property Rights",
-      content: "All content on this site—including text, graphics, logos, product descriptions, photography, and UI/UX design—is owned by Aura Inc. or our heritage suppliers. Copying, distributing, or reproducing any elements without explicit written consent is strictly prohibited.",
+      content: "All content on this site—including text, graphics, logos, product descriptions, photography, and UI/UX design—is owned by Slmalkoha Inc. or our heritage suppliers. Copying, distributing, or reproducing any elements without explicit written consent is strictly prohibited.",
     },
     {
       title: "6. Governing Law",
@@ -106,7 +106,7 @@ const DEFAULT_REFUNDS: PolicyData = {
   lastUpdated: "June 21, 2026",
   badge: "Returns & Refunds",
   icon: "RotateCcw",
-  intro: "At Aura Inc., we take pride in the quality and craftsmanship of our Sri Lankan heritage exports. If you are not entirely satisfied with your purchase, we are here to assist with our transparent global return guidelines.",
+  intro: "At Slmalkoha Inc., we take pride in the quality and craftsmanship of our Sri Lankan heritage exports. If you are not entirely satisfied with your purchase, we are here to assist with our transparent global return guidelines.",
   sections: [
     {
       title: "1. 30-Day Return Window",
@@ -130,15 +130,15 @@ const DEFAULT_REFUNDS: PolicyData = {
     },
     {
       title: "6. How to Initiate a Return",
-      content: "To begin a return, please submit your request to our support desk at support@aura.com referencing your Order Number (e.g. ORD-12345). Please do not send items back without an authorized return merchandise authorization (RMA) label.",
+      content: "To begin a return, please submit your request to our support desk at support@Slmalkohacom referencing your Order Number (e.g. ORD-12345). Please do not send items back without an authorized return merchandise authorization (RMA) label.",
     },
   ],
 };
 
 const LS_KEYS = {
-  privacy: "aura_policy_privacy",
-  terms: "aura_policy_terms",
-  refund: "aura_policy_refund",
+  privacy: "Slmalkoha_policy_privacy",
+  terms: "Slmalkoha_policy_terms",
+  refund: "Slmalkoha_policy_refund",
 } as const;
 
 type ActiveTab = "privacy" | "terms" | "refund";
@@ -363,7 +363,7 @@ export default function CMSPage() {
           } else if (tab === "terms") {
             label = "Terms & Conditions";
             IconComp = Scale;
-          } else {
+          } else if (tab === "refund") {
             label = "Refund Policy";
             IconComp = RotateCcw;
           }
@@ -372,11 +372,10 @@ export default function CMSPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-2 px-5 py-3 border-b-2 text-xs font-bold transition whitespace-nowrap ${
-                isActive
-                  ? "border-brand text-brand bg-brand/5"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
+              className={`flex items-center gap-2 px-5 py-3 border-b-2 text-xs font-bold transition whitespace-nowrap ${isActive
+                ? "border-brand text-brand bg-brand/5"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
             >
               <IconComp size={14} />
               {label}
@@ -391,7 +390,7 @@ export default function CMSPage() {
         <div className="lg:col-span-7 space-y-6">
           <div className="rounded-2xl bg-card border border-border p-6 shadow-card space-y-4">
             <h2 className="text-sm font-bold text-foreground pb-2 border-b border-border">Page Settings</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
@@ -536,6 +535,7 @@ export default function CMSPage() {
               <Plus size={14} /> Add New Policy Section
             </button>
           </div>
+
         </div>
 
         {/* Live Preview Pane: 5 columns on large screens */}
@@ -555,36 +555,50 @@ export default function CMSPage() {
                 <ArrowUp size={10} className="-rotate-90" /> Back to Store
               </div>
 
-              <div className="border-b border-border pb-5 space-y-3">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 text-brand px-2.5 py-0.5 text-[10px] font-bold">
-                  {renderIcon(editingData.icon, 10)} {editingData.badge || "Legal Guidelines"}
+            <div className="rounded-2xl bg-muted/30 border border-border overflow-hidden relative shadow-inner">
+                {/* Simulated browser header */}
+                <div className="h-10 border-b border-border/80 bg-muted/50 flex items-center px-4 gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                  </div>
+                  <div className="ml-4 rounded-md bg-background px-3 py-1 text-[10px] text-muted-foreground flex-1 truncate font-mono">
+                    slmalkoha.com{getLiveLink()}
+                  </div>
                 </div>
-                <h1 className="text-2xl font-extrabold tracking-tight text-foreground leading-tight">
-                  {editingData.title || "Policy Title"}
-                </h1>
-                <p className="text-[10px] text-muted-foreground">Last updated: {editingData.lastUpdated}</p>
-              </div>
 
-              {/* Policy Body */}
-              <div className="space-y-5 text-xs font-sans text-foreground/80 leading-relaxed">
-                <p className="font-semibold text-foreground">{editingData.intro}</p>
+                {/* Simulated page content */}
+                <div className="p-6 h-[600px] overflow-y-auto bg-background scrollbar-hide">
+                    <div className="space-y-6">
+                      <div className="inline-flex items-center gap-2 rounded-full bg-brand/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
+                        {renderIcon(editingData.icon, 12)}
+                        {editingData.badge}
+                      </div>
+                      <h1 className="text-3xl font-[family-name:var(--font-serif)] font-bold text-foreground">
+                        {editingData.title}
+                      </h1>
+                      <div className="text-xs font-semibold text-muted-foreground">
+                        Last Updated: {editingData.lastUpdated}
+                      </div>
 
-                {editingData.sections.map((section, idx) => (
-                  <div key={idx} className="space-y-2">
-                    <h2 className="text-sm font-bold text-foreground border-l-2 border-brand pl-2 mt-4">
-                      {section.title || `Section ${idx + 1}`}
-                    </h2>
-                    <div className="space-y-2 leading-relaxed">
-                      {parsePreviewText(section.content || "")}
+                      <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/80 mt-6 leading-relaxed">
+                        <p>{editingData.intro}</p>
+                      </div>
+
+                      <div className="mt-8 space-y-8">
+                        {editingData.sections.map((sec, idx) => (
+                          <div key={idx}>
+                            <h2 className="text-lg font-bold text-foreground mb-3">{sec.title}</h2>
+                            <div className="text-sm">
+                              {parsePreviewText(sec.content)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
 
-                {editingData.sections.length === 0 && (
-                  <div className="text-center py-6 text-muted-foreground text-xs italic">
-                    No sections added yet. Click &apos;Add Section&apos; in the controller to populate details.
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>

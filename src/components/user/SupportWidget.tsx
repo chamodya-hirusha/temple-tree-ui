@@ -19,7 +19,7 @@ export function SupportWidget() {
     {
       id: "1",
       sender: "agent",
-      text: "Hi there! Welcome to AURA. I am Chamodya from Support. How can I help you today?",
+      text: "Hi there! Welcome to Slmalkoha I am Chamodya from Support. How can I help you today?",
       timestamp: new Date(),
     },
   ]);
@@ -66,8 +66,8 @@ export function SupportWidget() {
 
     // Simulate Agent Reply
     setTimeout(() => {
-      let replyText = "Thank you for reaching out! A support coordinator will join the chat shortly. You can also email us directly at support@aura.com.";
-      
+      let replyText = "Thank you for reaching out! A support coordinator will join the chat shortly. You can also email us directly at support@Slmalkohacom.";
+
       const lower = textToSend.toLowerCase();
       if (lower.includes("track") || lower.includes("order")) {
         replyText = "Sure! You can track your packages live using our Order Tracking portal. Click here to check status: /track";
@@ -115,7 +115,7 @@ export function SupportWidget() {
             onClick={() => { setIsOpen(true); setShowTooltip(false); }}
             className="absolute bottom-16 right-0 mb-2 w-48 bg-card border border-border rounded-2xl p-3 shadow-card cursor-pointer text-left hover:border-brand transition"
           >
-            <div className="text-[10px] font-bold text-brand uppercase tracking-wider">AURA Concierge</div>
+            <div className="text-[10px] font-bold text-brand uppercase tracking-wider">Slmalkoha Concierge</div>
             <p className="text-xs text-foreground font-semibold mt-0.5">Need help with shipping or order tracking?</p>
             <div className="absolute bottom-[-6px] right-6 w-3 h-3 bg-card border-r border-b border-border rotate-45" />
           </motion.div>
@@ -167,11 +167,10 @@ export function SupportWidget() {
                 return (
                   <div key={m.id} className={`flex ${isAgent ? "justify-start" : "justify-end"}`}>
                     <div
-                      className={`max-w-[80%] rounded-2xl p-3 leading-relaxed ${
-                        isAgent
-                          ? "bg-muted text-foreground border border-border"
-                          : "bg-brand text-brand-foreground shadow-glow font-medium"
-                      }`}
+                      className={`max-w-[80%] rounded-2xl p-3 leading-relaxed ${isAgent
+                        ? "bg-muted text-foreground border border-border"
+                        : "bg-brand text-brand-foreground shadow-glow font-medium"
+                        }`}
                     >
                       {m.text.includes("/track") ? (
                         <div>
@@ -187,9 +186,8 @@ export function SupportWidget() {
                         m.text
                       )}
                       <span
-                        className={`block text-[9px] mt-1 text-right ${
-                          isAgent ? "text-muted-foreground" : "text-brand-foreground/70"
-                        }`}
+                        className={`block text-[9px] mt-1 text-right ${isAgent ? "text-muted-foreground" : "text-brand-foreground/70"
+                          }`}
                       >
                         {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </span>

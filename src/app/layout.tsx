@@ -14,17 +14,17 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Aura — Premium Single-Vendor Store",
-  description: "Premium tech, fashion & lifestyle from Aura.",
+  title: "Slmalkoha — Premium Single-Vendor Store",
+  description: "Premium tech, fashion & lifestyle from Slmalkoha",
   openGraph: {
-    title: "Aura — Premium Single-Vendor Store",
-    description: "Premium tech, fashion & lifestyle from Aura.",
+    title: "Slmalkoha — Premium Single-Vendor Store",
+    description: "Premium tech, fashion & lifestyle from Slmalkoha",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aura — Premium Single-Vendor Store",
-    description: "Premium tech, fashion & lifestyle from Aura.",
+    title: "Slmalkoha — Premium Single-Vendor Store",
+    description: "Premium tech, fashion & lifestyle from Slmalkoha",
   },
 };
 

@@ -54,7 +54,7 @@ export default function AccountDashboard() {
   const getTrackingInfo = (orderId: string, status: string) => {
     if (status === "Pending") return { carrier: "Processing", code: "Awaiting dispatch" };
     if (status === "Cancelled") return { carrier: "None", code: "Order Cancelled" };
-    
+
     // Hash order ID to get consistent numbers
     let hash = 0;
     for (let i = 0; i < orderId.length; i++) hash = orderId.charCodeAt(i) + ((hash << 5) - hash);
@@ -130,8 +130,8 @@ export default function AccountDashboard() {
 
             <div className="rounded-2xl border border-border bg-card p-4 mt-6 text-xs text-muted-foreground space-y-2 leading-relaxed">
               <div className="font-bold text-foreground flex items-center gap-1.5"><ShieldCheck size={14} className="text-success" /> Customer Support</div>
-              Need help with international shipping, custom duties or payment queries? 
-              <a href="mailto:support@auracraft.com" className="text-brand font-bold hover:underline block mt-1">support@auracraft.com</a>
+              Need help with international shipping, custom duties or payment queries?
+              <a href="mailto:support@Slmalkohacraft.com" className="text-brand font-bold hover:underline block mt-1">support@Slmalkohacraft.com</a>
             </div>
           </aside>
 

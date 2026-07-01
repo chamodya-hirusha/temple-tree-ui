@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Heart, Minus, Plus, ShoppingCart, Truck, ShieldCheck, RotateCcw, Zap, ChevronRight, Check,
@@ -24,8 +24,9 @@ const COUNTRY_OPTIONS = [
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
-  const { products, addToCart, toggleWishlist, wishlist, setCartOpen, formatPrice, coupons } = useStore();
+  const { products, addToCart, toggleWishlist, wishlist, formatPrice, coupons } = useStore();
   const product = products.find((p) => p.id === id);
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
@@ -201,13 +202,13 @@ export default function ProductPage() {
 
             <div className="mt-5 flex flex-wrap gap-3">
               <button
-                onClick={() => { addToCart(product, qty); setCartOpen(true); }}
+                onClick={() => { addToCart(product, qty); }}
                 className="flex-1 min-w-[160px] flex items-center justify-center gap-2 rounded-xl border-2 border-brand text-brand py-3 font-bold hover:bg-brand hover:text-brand-foreground transition"
               >
                 <ShoppingCart size={16} /> Add to Cart
               </button>
               <button
-                onClick={() => { addToCart(product, qty); }}
+                onClick={() => { addToCart(product, qty); router.push("/cart"); }}
                 className="flex-1 min-w-[160px] flex items-center justify-center gap-2 rounded-xl bg-brand text-brand-foreground py-3 font-bold hover:bg-brand-dark transition shadow-glow"
               >
                 <Zap size={16} /> Buy Now

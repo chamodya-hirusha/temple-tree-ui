@@ -23,11 +23,11 @@ const DEFAULT_TERMS: PolicyData = {
   lastUpdated: "June 21, 2026",
   badge: "Agreements & Terms",
   icon: "Scale",
-  intro: "Welcome to the Aura Inc. e-commerce platform. By accessing or purchasing from our website, you agree to be bound by the following Terms & Conditions. Please read them carefully before finalizing your orders.",
+  intro: "Welcome to the Slmalkoha Inc. e-commerce platform. By accessing or purchasing from our website, you agree to be bound by the following Terms & Conditions. Please read them carefully before finalizing your orders.",
   sections: [
     {
       title: "1. User Account & Security",
-      content: "To complete purchases and utilize member discounts (such as Aura+ benefits), you may register an account. You are responsible for keeping your credential details private. We reserve the right to close accounts or restrict access if fraud or terms violation is suspected.",
+      content: "To complete purchases and utilize member discounts (such as Slmalkoha+ benefits), you may register an account. You are responsible for keeping your credential details private. We reserve the right to close accounts or restrict access if fraud or terms violation is suspected.",
     },
     {
       title: "2. Product Pricing & Currency Conversion",
@@ -39,11 +39,11 @@ const DEFAULT_TERMS: PolicyData = {
     },
     {
       title: "4. Limitation of Liability",
-      content: "Aura Inc. is not liable for any indirect, incidental, or punitive damages resulting from your use of the store, including transit delays caused by couriers, weather disruptions, or customs clearance holds. Our total liability for any purchase shall not exceed the price paid for the specific item in question.",
+      content: "Slmalkoha Inc. is not liable for any indirect, incidental, or punitive damages resulting from your use of the store, including transit delays caused by couriers, weather disruptions, or customs clearance holds. Our total liability for any purchase shall not exceed the price paid for the specific item in question.",
     },
     {
       title: "5. Intellectual Property Rights",
-      content: "All content on this site—including text, graphics, logos, product descriptions, photography, and UI/UX design—is owned by Aura Inc. or our heritage suppliers. Copying, distributing, or reproducing any elements without explicit written consent is strictly prohibited.",
+      content: "All content on this site—including text, graphics, logos, product descriptions, photography, and UI/UX design—is owned by Slmalkoha Inc. or our heritage suppliers. Copying, distributing, or reproducing any elements without explicit written consent is strictly prohibited.",
     },
     {
       title: "6. Governing Law",
@@ -56,7 +56,7 @@ export default function TermsAndConditionsPage() {
   const [data, setData] = useState<PolicyData>(DEFAULT_TERMS);
 
   useEffect(() => {
-    const saved = localStorage.getItem("aura_policy_terms");
+    const saved = localStorage.getItem("Slmalkoha_policy_terms");
     if (saved) {
       try {
         setData(JSON.parse(saved));

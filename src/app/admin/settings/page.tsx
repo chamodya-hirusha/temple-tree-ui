@@ -26,8 +26,8 @@ export default function SettingsAdminPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   // 1. Profile States
-  const [storeName, setStoreName] = useState("AURA Luxury Inc.");
-  const [supportEmail, setSupportEmail] = useState("support@aura.com");
+  const [storeName, setStoreName] = useState("Slmalkoha Luxury Inc.");
+  const [supportEmail, setSupportEmail] = useState("support@Slmalkohacom");
   const [currency, setCurrency] = useState("USD");
   const [phone, setPhone] = useState("+94 11 234 5678");
   const [address, setAddress] = useState("100 Galle Road, Colombo 03, Sri Lanka");
@@ -63,7 +63,7 @@ export default function SettingsAdminPage() {
     setTimeout(() => {
       setIsSaving(false);
       toast.success("Store configurations updated successfully!");
-      
+
       console.log("Updated Configurations:", {
         tab: activeTab,
         data: {

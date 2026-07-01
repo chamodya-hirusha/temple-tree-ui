@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, ShoppingCart, Heart, User, Globe, Phone, Truck,
-  LayoutDashboard, ChevronDown, Menu, Sparkles, X,
-  Coffee, Flame, Palette, Shirt, Leaf,
+  LayoutDashboard, ChevronDown, Menu, Sparkles, X, Bell,
+  Coffee, Flame, Palette, Shirt, Leaf, Settings, FileText, LogOut
 } from "lucide-react";
+import { toast } from "sonner";
 import { useStore } from "@/context/StoreContext";
 import { CATEGORIES } from "@/data/products";
 import { cn } from "@/lib/utils";
@@ -91,12 +92,9 @@ export function UserHeader() {
       {/* Main bar */}
       <div className="mx-auto max-w-7xl px-4 h-20 flex items-center gap-6">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-brand shadow-glow">
-            <Sparkles className="text-brand-foreground" size={20} />
-          </div>
-          <div className="leading-none">
-            <div className="text-lg font-extrabold tracking-tight text-foreground">AURA<span className="text-brand">.</span></div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">single-vendor store</div>
+
+          <div className="leading-none flex flex-col items-center justify-center -ml-2">
+            <div className="text-2xl font-serif font-bold tracking-wide text-stone-900">Slmalkoha<span className="text-brand">.</span></div>
           </div>
         </Link>
 
@@ -149,7 +147,7 @@ export function UserHeader() {
           >
             <User size={18} /> <span className="hidden lg:inline">{user ? user.name.split(" ")[0] : "My Account"}</span>
           </Link>
-          <Link href="/cart" className="relative grid place-items-center h-10 w-10 rounded-lg hover:bg-muted transition">
+          <Link href="/wishlist" className="relative grid place-items-center h-10 w-10 rounded-lg hover:bg-muted transition">
             <Heart size={20} />
             {wishlist.length > 0 && (
               <span className="absolute -top-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
@@ -157,7 +155,7 @@ export function UserHeader() {
               </span>
             )}
           </Link>
-          <button onClick={() => setCartOpen(true)} className="relative grid place-items-center h-10 w-10 rounded-lg hover:bg-muted transition">
+          <Link href="/cart" className="relative grid place-items-center h-10 w-10 rounded-lg hover:bg-muted transition">
             <ShoppingCart size={20} />
             {cartCount > 0 && (
               <motion.span
@@ -168,7 +166,7 @@ export function UserHeader() {
                 {cartCount}
               </motion.span>
             )}
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -201,13 +199,17 @@ export function UserHeader() {
             </AnimatePresence>
           </div>
           <nav className="hidden md:flex items-center gap-1 text-sm">
-            {["Flash Sale", "New Arrivals", "Bestsellers", "Lookbook", "Brand Story", "Support"].map((l) => (
-              <a key={l} href="#" className={cn("px-3 py-2 rounded-lg hover:text-brand transition", l === "Flash Sale" && "text-brand font-semibold")}>{l}</a>
+            {[
+              { name: "Flash Sale", path: "/flash-sale" },
+              { name: "New Arrivals", path: "/new-arrivals" },
+              { name: "Support", path: "/support" }
+            ].map((l) => (
+              <Link key={l.name} href={l.path} className={cn("px-3 py-2 rounded-lg hover:text-brand transition", l.name === "Flash Sale" && "text-brand font-semibold")}>
+                {l.name}
+              </Link>
             ))}
           </nav>
-          <div className="ml-auto text-xs text-muted-foreground hidden md:block">
-            Free shipping over <span className="font-bold text-foreground">$500</span> · 2-year warranty
-          </div>
+
         </div>
       </div>
     </header>

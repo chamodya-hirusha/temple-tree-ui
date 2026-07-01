@@ -57,7 +57,7 @@ function OrderSuccessContent() {
   };
 
   const shippingUSD = getShippingCost(order.country);
-  
+
   // Calculate items subtotal based on purchase price logs
   const subtotalUSD = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const discountUSD = Math.max(0, subtotalUSD + shippingUSD - order.total);
@@ -85,7 +85,7 @@ function OrderSuccessContent() {
   return (
     <div className="min-h-screen bg-muted/20 pb-20 pt-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        
+
         {/* Success Header & Animation */}
         <div className="text-center space-y-4">
           <motion.div
@@ -289,8 +289,8 @@ function OrderSuccessContent() {
           </p>
           <p className="flex items-center justify-center gap-1">
             <HelpCircle size={10} /> Need help? Contact our Support Desk at{" "}
-            <a href="mailto:support@aura.com" className="text-brand hover:underline font-semibold">
-              support@aura.com
+            <a href="mailto:support@Slmalkohacom" className="text-brand hover:underline font-semibold">
+              support@Slmalkohacom
             </a>
           </p>
         </motion.div>

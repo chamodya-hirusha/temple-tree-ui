@@ -53,29 +53,10 @@ function Hero() {
   return (
     <section className="mx-auto max-w-7xl px-4 mt-5">
       <div className="grid grid-cols-12 gap-4" onMouseLeave={() => setHoveredCategory(null)}>
-        {/* Vertical categories */}
-        <aside className="hidden lg:block col-span-3 rounded-2xl bg-card border border-border shadow-card p-2 h-[440px] overflow-y-auto scrollbar-hide">
-          <div className="px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">Categories</div>
-          {CATEGORIES.map((c) => {
-            const Icon = ICONS[c.icon as keyof typeof ICONS] ?? Sparkles;
-            const isHovered = hoveredCategory === c.name;
-            return (
-              <a 
-                key={c.name} 
-                href="#" 
-                onMouseEnter={() => setHoveredCategory(c.name)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition group ${isHovered ? 'bg-accent text-brand' : 'hover:bg-accent hover:text-brand'}`}
-              >
-                <Icon size={16} className={`group-hover:text-brand ${isHovered ? 'text-brand' : 'text-muted-foreground'}`} />
-                <span className="text-sm flex-1">{c.name}</span>
-                <ChevronRight size={14} className={`text-brand transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-              </a>
-            );
-          })}
-        </aside>
 
-        {/* Slider & Flyout */}
-        <div className="col-span-12 lg:col-span-6 relative h-[440px] rounded-2xl overflow-hidden shadow-card border border-border/10">
+
+        {/* Slider */}
+        <div className="col-span-12 lg:col-span-9 relative h-[440px] rounded-2xl overflow-hidden shadow-card border border-border/10">
           <AnimatePresence mode="wait">
             <motion.div
               key={i}
@@ -112,50 +93,7 @@ function Hero() {
             ))}
           </div>
 
-          {/* Subcategories Flyout Overlay */}
-          <AnimatePresence>
-            {hoveredCategory && (
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 z-50 bg-card/98 backdrop-blur-2xl p-8 lg:p-10 border-l border-border flex flex-col"
-              >
-                <h3 className="text-3xl font-[family-name:var(--font-serif)] font-medium mb-8 text-foreground tracking-tight">{hoveredCategory}</h3>
-                <div className="columns-1 sm:columns-2 lg:columns-3 gap-x-12 overflow-y-auto pr-4 pb-4 scrollbar-hide">
-                  {CATEGORIES.find(c => c.name === hoveredCategory)?.subcategories?.map(sub => {
-                    const isObj = typeof sub === "object";
-                    const subName = isObj ? sub.name : sub;
-                    const items = isObj ? sub.items : undefined;
-                    
-                    return (
-                      <div key={subName} className="mb-8 break-inside-avoid">
-                        <Link 
-                          href={`/products`} 
-                          className="group flex items-center justify-between text-base font-semibold text-foreground hover:text-brand transition-all duration-300 pb-2"
-                        >
-                           <span>{subName}</span>
-                           <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out text-brand">
-                             <ChevronRight size={16} />
-                           </span>
-                        </Link>
-                        {items && items.length > 0 && (
-                          <div className="flex flex-col pl-4 border-l border-border/80 ml-2 mt-2 space-y-2.5">
-                            {items.map(item => (
-                              <Link key={item} href={`/products`} className="text-[14px] text-foreground/70 hover:text-brand hover:translate-x-0.5 transition-all duration-300">
-                                {item}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
         </div>
 
         {/* Right rails */}
@@ -164,7 +102,7 @@ function Hero() {
             <div className="text-xs font-semibold uppercase tracking-wider opacity-80">Members</div>
             <div className="mt-1 text-2xl font-extrabold leading-tight">Get 25% off your first order</div>
             <p className="mt-1 text-sm opacity-90">Use code BRAND25 at checkout</p>
-            <button className="mt-4 rounded-lg bg-background text-foreground px-3 py-2 text-xs font-bold">Join Aura+</button>
+            <button className="mt-4 rounded-lg bg-background text-foreground px-3 py-2 text-xs font-bold">Join Slmalkoha+</button>
             <Sparkles className="absolute -bottom-4 -right-4 opacity-20" size={120} />
           </div>
           <div className="flex-1 rounded-2xl bg-foreground text-background p-5 shadow-card relative overflow-hidden">
@@ -205,7 +143,7 @@ function FlashSale() {
     if (!el || !flashSaleActive) return;
 
     let animationId: number;
-    
+
     const scroll = () => {
       if (!el) return;
       el.scrollLeft += 1;
@@ -265,7 +203,7 @@ function FlashSale() {
                 <motion.div initial={{ width: 0 }} animate={{ width: `${flashSaleProgress}%` }} transition={{ duration: 0.5 }} className="h-full bg-gradient-brand" />
               </div>
             </div>
-            <Link href="/products" className="text-sm font-semibold text-brand hover:underline">Shop all →</Link>
+            <Link href="/flash-sale" className="text-sm font-semibold text-brand hover:underline">Shop all →</Link>
           </div>
         </div>
         <div ref={scrollRef} className="mt-6 flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 scroll-smooth-none">
@@ -285,22 +223,11 @@ function FlashSale() {
 }
 
 function BannerAds() {
+  const { banners } = useStore();
+
   return (
     <section className="mx-auto max-w-7xl px-4 mt-12 grid md:grid-cols-2 gap-4">
-      {[
-        {
-          img: "/assets/product-5.png",
-          tag: "Handicrafts",
-          title: "Heritage Wood & Brass",
-          sub: "Authentic carvings by generational island artisans",
-        },
-        {
-          img: "/assets/product-10.png",
-          tag: "Ceylon Tea",
-          title: "Imperial Silver Tips",
-          sub: "Single-origin luxury tea placked in Nuwara Eliya hills",
-        },
-      ].map((b) => (
+      {banners.map((b) => (
         <motion.a
           key={b.title}
           href="#"

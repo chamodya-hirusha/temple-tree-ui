@@ -46,14 +46,14 @@ export default function Checkout() {
   }, [country, paymentMethod]);
 
   const selectedCountryObj = COUNTRIES.find((c) => c.name === country) || COUNTRIES[0];
-  
+
   // Check if applied voucher is a free shipping voucher
   const activeCouponObj = coupons?.find((c) => c.code.toUpperCase() === voucher?.toUpperCase());
   const isFreeShipApplied = activeCouponObj?.type === "freeship" && (
-    activeCouponObj.applicableTo === "all" || 
+    activeCouponObj.applicableTo === "all" ||
     cart.some((item) => activeCouponObj.productIds?.includes(item.product.id))
   );
-  
+
   const shippingCostUSD = isFreeShipApplied ? 0 : selectedCountryObj.shippingUSD;
 
   // Calculate final totals
@@ -97,7 +97,7 @@ export default function Checkout() {
     addOrder(newOrder);
     toast.success(`Order ${orderId} placed successfully! 🎉`);
     clearCart();
-    
+
     // Redirect to order success page
     setTimeout(() => {
       router.push(`/order-success?orderId=${orderId}`);
@@ -343,7 +343,7 @@ export default function Checkout() {
                     </div>
                     <div className="text-xs text-foreground font-semibold space-y-1 bg-card border border-border p-3 rounded-xl leading-relaxed">
                       <div><span className="text-muted-foreground">Bank name:</span> Bank of Ceylon (BOC)</div>
-                      <div><span className="text-muted-foreground">Account Name:</span> AURA EXPORTS PVT LTD</div>
+                      <div><span className="text-muted-foreground">Account Name:</span> Slmalkoha EXPORTS PVT LTD</div>
                       <div><span className="text-muted-foreground">LKR Account:</span> 8439-0028-1122 (Colombo Fort Branch)</div>
                       <div><span className="text-muted-foreground">USD Account:</span> 9012-7744-8833 (Swift Route)</div>
                       <div><span className="text-muted-foreground">SWIFT Code:</span> BCEYLKPAXXX</div>
@@ -406,7 +406,7 @@ export default function Checkout() {
                     View Available Coupons
                   </button>
                 </div>
-                
+
                 {!voucher ? (
                   <div className="flex gap-2">
                     <input
@@ -462,7 +462,7 @@ export default function Checkout() {
                     {shippingCostUSD === 0 ? "FREE" : formatPrice(shippingCostUSD)}
                   </span>
                 </div>
-                
+
                 {/* Conversions View */}
                 <div className="bg-muted/15 rounded-xl border border-border p-3.5 mt-2 space-y-1">
                   <div className="flex justify-between text-[11px] font-bold text-muted-foreground">
@@ -566,8 +566,8 @@ export default function Checkout() {
                                 voucher === c.code
                                   ? "border-success bg-success/5"
                                   : isReady
-                                  ? "border-brand/30 bg-brand/5"
-                                  : "border-border/60 bg-muted/20 opacity-60"
+                                    ? "border-brand/30 bg-brand/5"
+                                    : "border-border/60 bg-muted/20 opacity-60"
                               )}
                             >
                               <div className="flex items-start justify-between gap-3">
@@ -594,8 +594,8 @@ export default function Checkout() {
                                     voucher === c.code
                                       ? "bg-success/20 text-success cursor-default"
                                       : isReady
-                                      ? "bg-brand text-brand-foreground hover:bg-brand-dark"
-                                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                                        ? "bg-brand text-brand-foreground hover:bg-brand-dark"
+                                        : "bg-muted text-muted-foreground cursor-not-allowed"
                                   )}
                                 >
                                   {voucher === c.code ? "Applied" : "Apply"}

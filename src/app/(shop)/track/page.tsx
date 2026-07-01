@@ -71,7 +71,7 @@ export default function OrderTrackingPage() {
   return (
     <div className="min-h-screen bg-muted/20 pb-24 pt-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-3xl mx-auto space-y-6">
-        
+
         {/* Back Link */}
         <Link
           href="/"
@@ -110,7 +110,7 @@ export default function OrderTrackingPage() {
               <input
                 required
                 type="email"
-                placeholder="buyer@aura.com"
+                placeholder="buyer@Slmalkohacom"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-semibold outline-none focus:border-brand"
@@ -133,7 +133,7 @@ export default function OrderTrackingPage() {
         {searched && (
           foundOrder ? (
             <div className="space-y-6">
-              
+
               {/* Tracker Card */}
               <div className="rounded-3xl bg-card border border-border p-6 shadow-card space-y-6">
                 <div className="flex justify-between items-center flex-wrap gap-4 border-b border-border pb-4">
@@ -177,11 +177,10 @@ export default function OrderTrackingPage() {
                     ].map((step, idx) => (
                       <div key={step.label} className="flex sm:flex-col items-center sm:text-center gap-3 sm:gap-2">
                         <div
-                          className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-bold z-10 border transition-all ${
-                            step.done
-                              ? "bg-brand text-brand-foreground shadow-glow border-brand"
-                              : "bg-muted text-muted-foreground border-border"
-                          }`}
+                          className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-bold z-10 border transition-all ${step.done
+                            ? "bg-brand text-brand-foreground shadow-glow border-brand"
+                            : "bg-muted text-muted-foreground border-border"
+                            }`}
                         >
                           {step.done ? <Check size={12} strokeWidth={2.5} /> : idx + 1}
                         </div>
@@ -250,7 +249,7 @@ export default function OrderTrackingPage() {
                 {/* Items Summary Column */}
                 <div className="md:col-span-7 rounded-3xl bg-card border border-border p-6 shadow-card space-y-4">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Order Items</h3>
-                  
+
                   <div className="divide-y divide-border/60 max-h-56 overflow-y-auto pr-1">
                     {foundOrder.items.map((item: any) => (
                       <div key={item.productId} className="flex gap-3 py-3 first:pt-0">
@@ -300,7 +299,7 @@ export default function OrderTrackingPage() {
 
         {/* Helpful Support guidelines */}
         <div className="text-center text-[10px] text-muted-foreground flex items-center justify-center gap-1">
-          <HelpCircle size={10} /> Need help resolving shipment issues? Email our support desk at <a href="mailto:support@aura.com" className="text-brand font-semibold hover:underline">support@aura.com</a>
+          <HelpCircle size={10} /> Need help resolving shipment issues? Email our support desk at <a href="mailto:support@Slmalkohacom" className="text-brand font-semibold hover:underline">support@Slmalkohacom</a>
         </div>
 
       </div>
