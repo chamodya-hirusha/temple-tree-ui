@@ -23,7 +23,6 @@ const SECTIONS = [
       { href: "/admin/products", label: "Products", icon: Package },
       { href: "/admin/inventory", label: "Inventory", icon: PackageSearch },
       { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-      { href: "/admin/bank-transfers", label: "Bank Transfers", icon: Landmark },
       { href: "/admin/customers", label: "Customers", icon: Users },
     ],
   },

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CreditCard, Landmark, Truck, Lock, Check, ShieldCheck, AlertTriangle, X } from "lucide-react";
+import { CreditCard, Truck, Lock, Check, ShieldCheck, AlertTriangle, X } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -36,7 +36,7 @@ export default function Checkout() {
   const [postalCode, setPostalCode] = useState("NW1 6XE");
   const [country, setCountry] = useState<string>("United States");
 
-  const [paymentMethod, setPaymentMethod] = useState<"Card" | "Bank Transfer" | "COD">("Card");
+  const [paymentMethod, setPaymentMethod] = useState<"Card" | "COD">("Card");
 
   // Reset payment method if COD was selected and country changes to non-Sri Lanka
   useEffect(() => {
@@ -80,7 +80,6 @@ export default function Checkout() {
       status: "Pending" as const,
       country,
       paymentMethod,
-      depositSlipUrl: paymentMethod === "Bank Transfer" ? "/assets/deposit-slip.png" : undefined,
       items: cart.map((item) => {
         const activeProd = products.find((p) => p.id === item.product.id) || item.product;
         const activePrice = activeProd.flashSale && activeProd.flashSalePrice ? activeProd.flashSalePrice : activeProd.price;
@@ -239,26 +238,6 @@ export default function Checkout() {
                   )}
                 </button>
 
-                {/* Option 2: Bank Transfer */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("Bank Transfer")}
-                  className={cn(
-                    "relative text-left rounded-xl border p-4 transition-all duration-200",
-                    paymentMethod === "Bank Transfer"
-                      ? "border-brand bg-brand/5 shadow-glow"
-                      : "border-border hover:border-foreground/30"
-                  )}
-                >
-                  <Landmark size={20} className="text-brand" />
-                  <div className="mt-3 font-extrabold text-sm text-foreground">Bank Transfer</div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5">Local LKR & USD routing</div>
-                  {paymentMethod === "Bank Transfer" && (
-                    <span className="absolute top-3 right-3 grid h-5 w-5 place-items-center rounded-full bg-brand text-brand-foreground">
-                      <Check size={11} />
-                    </span>
-                  )}
-                </button>
 
                 {/* Option 3: COD (Sri Lanka Only) */}
                 {country === "Sri Lanka" && (
@@ -331,30 +310,6 @@ export default function Checkout() {
                 </motion.div>
               )}
 
-              {paymentMethod === "Bank Transfer" && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-5 border-t border-border pt-4 space-y-3"
-                >
-                  <div className="rounded-2xl border border-brand/20 bg-brand/5 p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-brand text-xs font-extrabold uppercase tracking-wide">
-                      <Landmark size={15} /> Ceylon Merchant Account Details
-                    </div>
-                    <div className="text-xs text-foreground font-semibold space-y-1 bg-card border border-border p-3 rounded-xl leading-relaxed">
-                      <div><span className="text-muted-foreground">Bank name:</span> Bank of Ceylon (BOC)</div>
-                      <div><span className="text-muted-foreground">Account Name:</span> Slmalkoha EXPORTS PVT LTD</div>
-                      <div><span className="text-muted-foreground">LKR Account:</span> 8439-0028-1122 (Colombo Fort Branch)</div>
-                      <div><span className="text-muted-foreground">USD Account:</span> 9012-7744-8833 (Swift Route)</div>
-                      <div><span className="text-muted-foreground">SWIFT Code:</span> BCEYLKPAXXX</div>
-                    </div>
-                    <div className="text-[11px] text-muted-foreground flex gap-2 items-start mt-1">
-                      <AlertTriangle size={14} className="text-brand shrink-0 mt-0.5" />
-                      Please deposit LKR {finalTotalLKR.toLocaleString()} / USD ${finalTotalUSD.toFixed(2)} to the respective account. A mock deposit slip will be created for review in the dashboard upon checkout confirmation.
-                    </div>
-                  </div>
-                </motion.div>
-              )}
             </section>
           </div>
 

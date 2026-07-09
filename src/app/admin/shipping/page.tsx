@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Truck, Save, Server, HelpCircle, Settings2, Globe, Percent, Download, Upload, Zap, Calculator } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { DataTablePagination } from "@/components/admin/DataTablePagination";
 
 interface Tariff {
   country: string;
@@ -16,7 +17,17 @@ const defaultTariffs: Tariff[] = [
   { country: "United States", baseline: 25, code: "US" },
   { country: "United Kingdom", baseline: 15, code: "GB" },
   { country: "Australia", baseline: 25, code: "AU" },
-  { country: "Singapore", baseline: 15, code: "SG" }
+  { country: "Singapore", baseline: 15, code: "SG" },
+  { country: "Canada", baseline: 20, code: "CA" },
+  { country: "Germany", baseline: 18, code: "DE" },
+  { country: "France", baseline: 18, code: "FR" },
+  { country: "Japan", baseline: 22, code: "JP" },
+  { country: "China", baseline: 12, code: "CN" },
+  { country: "India", baseline: 10, code: "IN" },
+  { country: "United Arab Emirates", baseline: 15, code: "AE" },
+  { country: "New Zealand", baseline: 28, code: "NZ" },
+  { country: "Italy", baseline: 18, code: "IT" },
+  { country: "Brazil", baseline: 35, code: "BR" }
 ];
 
 export default function ShippingLogisticsAdminPage() {
@@ -33,6 +44,19 @@ export default function ShippingLogisticsAdminPage() {
   const [simDest, setSimDest] = useState("US");
   const [simResult, setSimResult] = useState<any>(null);
   const [isSimulating, setIsSimulating] = useState(false);
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(shippingRates.length / ITEMS_PER_PAGE);
+
+  const paginatedShippingRates = shippingRates.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [shippingRates.length]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -436,7 +460,7 @@ export default function ShippingLogisticsAdminPage() {
                   ) : shippingRates.length === 0 ? (
                     <tr><td colSpan={4} className="p-8 text-center text-muted-foreground">No tariffs configured. Please import a CSV.</td></tr>
                   ) : (
-                    shippingRates.map((r, idx) => (
+                    paginatedShippingRates.map((r, idx) => (
                       <tr key={r.code} className="hover:bg-muted/10 transition-all">
                         <td className="p-4 font-bold text-foreground">{r.country}</td>
                         <td className="p-4 font-mono text-muted-foreground uppercase">{r.code}</td>
@@ -470,6 +494,13 @@ export default function ShippingLogisticsAdminPage() {
                 </tbody>
               </table>
             </div>
+            {shippingRates.length > 0 && (
+              <DataTablePagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
         )}
       </div>

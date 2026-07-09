@@ -8,6 +8,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { CustomDropdown } from "@/components/CustomDropdown";
+import { DataTablePagination } from "@/components/admin/DataTablePagination";
 
 interface ProductInventory {
   sku: string;
@@ -35,6 +36,7 @@ export default function InventoryAdminPage() {
   
   // Modal State
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
+  const [isLowStockModalOpen, setIsLowStockModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductInventory | null>(null);
   const [adjustStockValue, setAdjustStockValue] = useState<number>(0);
 
@@ -127,6 +129,46 @@ export default function InventoryAdminPage() {
     return <span className="px-2 py-0.5 bg-success/15 text-success rounded-full text-[10px] font-bold">In Stock</span>;
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [stockFilter, setStockFilter] = useState("All");
+
+  const categories = ["All", ...Array.from(new Set(inventory.map(p => p.category)))];
+  const categoryOptions = categories.map(c => ({ value: c, label: c === "All" ? "All Categories" : c }));
+  const stockOptions = [
+    { value: "All", label: "All Stock" },
+    { value: "In Stock", label: "In Stock" },
+    { value: "Low Stock", label: "Low Stock" },
+    { value: "Out of Stock", label: "Out of Stock" }
+  ];
+
+  const filteredInventory = inventory.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.sku.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === "All" || p.category === categoryFilter;
+    
+    let matchesStock = true;
+    if (stockFilter === "In Stock") matchesStock = p.stock >= 10;
+    else if (stockFilter === "Low Stock") matchesStock = p.stock > 0 && p.stock < 10;
+    else if (stockFilter === "Out of Stock") matchesStock = p.stock === 0;
+
+    return matchesSearch && matchesCategory && matchesStock;
+  });
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredInventory.length / ITEMS_PER_PAGE);
+
+  const paginatedInventory = filteredInventory.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, categoryFilter, stockFilter, inventory.length]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -152,24 +194,55 @@ export default function InventoryAdminPage() {
 
       {/* Low Stock Alert */}
       {lowStockItems.length > 0 && (
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600">
-          <AlertTriangle className="shrink-0 mt-0.5" size={18} />
-          <div>
-            <h4 className="text-sm font-bold">Low Stock Alert</h4>
-            <p className="text-xs opacity-90 mt-1">
-              You have {lowStockItems.length} product(s) with less than 10 units in stock. Consider restocking soon.
-            </p>
+        <div className="flex items-start justify-between gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="shrink-0 mt-0.5" size={18} />
+            <div>
+              <h4 className="text-sm font-bold">Low Stock Alert</h4>
+              <p className="text-xs opacity-90 mt-1">
+                You have {lowStockItems.length} product(s) with less than 10 units in stock. Consider restocking soon.
+              </p>
+            </div>
           </div>
+          <button 
+            onClick={() => setIsLowStockModalOpen(true)}
+            className="shrink-0 rounded-lg bg-amber-500/20 px-3 py-1.5 text-xs font-bold text-amber-700 hover:bg-amber-500/30 transition"
+          >
+            View Products
+          </button>
         </div>
       )}
 
       {/* Main Inventory Table */}
       <div className="rounded-2xl bg-card border border-border shadow-card overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h3 className="text-sm font-bold text-foreground">Product Catalog</h3>
-            <span className="rounded bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-bold flex items-center gap-1">
-              <CheckCircle2 size={11} /> {inventory.length} active SKUs
-            </span>
+          <div className="p-4 border-b border-border bg-muted/20 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm font-bold text-foreground">Product Catalog</h3>
+              <span className="rounded bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-bold flex items-center gap-1 shrink-0">
+                <CheckCircle2 size={11} /> {filteredInventory.length} active SKUs
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+              <input 
+                type="text" 
+                placeholder="Search SKU or Name..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 min-w-[200px] xl:w-64 rounded-xl border border-border bg-background px-3 py-2.5 text-xs outline-none focus:ring-2 ring-brand transition-all"
+              />
+              <CustomDropdown
+                options={categoryOptions}
+                selectedValue={categoryFilter}
+                onChange={setCategoryFilter}
+                className="w-[160px]"
+              />
+              <CustomDropdown
+                options={stockOptions}
+                selectedValue={stockFilter}
+                onChange={setStockFilter}
+                className="w-[140px]"
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto flex-1">
@@ -187,10 +260,10 @@ export default function InventoryAdminPage() {
               <tbody className="divide-y divide-border/60">
                 {isLoading ? (
                   <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">Loading inventory...</td></tr>
-                ) : inventory.length === 0 ? (
+                ) : paginatedInventory.length === 0 ? (
                   <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No inventory found.</td></tr>
                 ) : (
-                  inventory.map((p) => (
+                  paginatedInventory.map((p) => (
                     <tr key={p.sku} className="hover:bg-muted/10 transition-all">
                       <td className="p-4">
                         <div className="font-bold text-foreground">{p.name}</div>
@@ -218,6 +291,11 @@ export default function InventoryAdminPage() {
               </tbody>
             </table>
           </div>
+          <DataTablePagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
 
       {/* Adjust Stock Modal */}
@@ -258,6 +336,57 @@ export default function InventoryAdminPage() {
                   Save Changes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Low Stock Modal */}
+      {isLowStockModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-lg rounded-2xl border border-border shadow-card overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="flex items-center justify-between p-4 border-b border-border bg-muted/20 shrink-0">
+              <h3 className="font-bold text-sm flex items-center gap-2">
+                <AlertTriangle size={16} className="text-amber-500" /> Low Stock Products
+              </h3>
+              <button onClick={() => setIsLowStockModalOpen(false)} className="text-muted-foreground hover:text-foreground transition">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              <div className="space-y-3">
+                {lowStockItems.map(p => (
+                  <div key={p.sku} className="flex items-center justify-between p-3 rounded-xl border border-border/50 bg-muted/10">
+                    <div>
+                      <div className="font-bold text-sm">{p.name}</div>
+                      <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{p.sku}</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="px-2 py-0.5 bg-amber-500/15 text-amber-500 rounded-full text-[10px] font-bold">
+                        {p.stock === 0 ? "Out of Stock" : `${p.stock} left`}
+                      </span>
+                      <button 
+                        onClick={() => {
+                          setIsLowStockModalOpen(false);
+                          openAdjustModal(p);
+                        }}
+                        className="p-1.5 bg-muted text-foreground rounded-lg hover:text-brand hover:bg-brand/10 transition"
+                        title="Adjust Stock"
+                      >
+                        <Edit3 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="p-4 border-t border-border bg-muted/20 shrink-0">
+              <button 
+                onClick={() => setIsLowStockModalOpen(false)}
+                className="w-full bg-muted text-foreground rounded-xl py-2 text-xs font-bold hover:bg-muted/80 transition"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

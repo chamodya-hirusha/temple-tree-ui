@@ -25,14 +25,18 @@ const COUNTRY_OPTIONS = [
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const id = params?.id as string;
   const { products, addToCart, toggleWishlist, wishlist, formatPrice, coupons } = useStore();
-  const product = products.find((p) => p.id === id);
+  
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"specs" | "desc" | "reviews">("desc");
   const [voucherClaimed, setVoucherClaimed] = useState(false);
   const [shipCountry, setShipCountry] = useState("US");
+
+  if (!id) return null; // Wait for router to be ready
+
+  const product = products.find((p) => p.id === id);
 
   if (!product) {
     notFound();

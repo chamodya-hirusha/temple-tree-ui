@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Plus, Search, Edit3, Trash2, Filter, AlertCircle
 } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { cn } from "@/lib/utils";
+import { DataTablePagination } from "@/components/admin/DataTablePagination";
 
 export default function ProductsAdmin() {
   const { products, deleteProduct } = useStore();
@@ -16,6 +17,19 @@ export default function ProductsAdmin() {
     p.title.toLowerCase().includes(query.toLowerCase()) ||
     p.sku.toLowerCase().includes(query.toLowerCase())
   );
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+
+  const paginatedProducts = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, products.length]);
 
   return (
     <div className="space-y-6">
@@ -72,7 +86,7 @@ export default function ProductsAdmin() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
-              {filtered.map((p) => (
+              {paginatedProducts.map((p) => (
                 <tr key={p.id} className="hover:bg-muted/20 transition-all duration-150">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -174,6 +188,13 @@ export default function ProductsAdmin() {
             <AlertCircle size={28} className="mx-auto text-muted-foreground/60 mb-2" />
             <div className="text-sm font-semibold text-muted-foreground">No products match your search.</div>
           </div>
+        )}
+        {filtered.length > 0 && (
+          <DataTablePagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
     </div>

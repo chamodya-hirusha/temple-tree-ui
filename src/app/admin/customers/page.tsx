@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CUSTOMERS } from "@/data/products";
 import { Users, Search, ShoppingBag, DollarSign, Calendar, Mail, Compass, HelpCircle } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { cn } from "@/lib/utils";
+import { DataTablePagination } from "@/components/admin/DataTablePagination";
 
 export default function CustomersAdminPage() {
   const { formatPrice } = useStore();
@@ -15,6 +16,19 @@ export default function CustomersAdminPage() {
       c.name.toLowerCase().includes(query.toLowerCase()) ||
       c.email.toLowerCase().includes(query.toLowerCase())
   );
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredCustomers.length / ITEMS_PER_PAGE);
+
+  const paginatedCustomers = filteredCustomers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query]);
 
   // Compute total spent across mock buyers list
   const totalSpentUSD = CUSTOMERS.reduce((sum, c) => sum + c.spent, 0);
@@ -89,7 +103,7 @@ export default function CustomersAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
-                {filteredCustomers.map((c) => {
+                {paginatedCustomers.map((c) => {
                   const isLocal = c.email.endsWith(".lk");
                   return (
                     <tr key={c.id} className="hover:bg-muted/10 transition-all">
@@ -124,6 +138,13 @@ export default function CustomersAdminPage() {
             </table>
           )}
         </div>
+        {filteredCustomers.length > 0 && (
+          <DataTablePagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       {/* Support Helper */}

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Mail, Calendar, Eye, FileText, Landmark, CreditCard, Truck } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { type Order, type OrderStatus } from "@/data/products";
 import { cn } from "@/lib/utils";
 import { CustomDropdown } from "@/components/CustomDropdown";
+import { DataTablePagination } from "@/components/admin/DataTablePagination";
 
 const STATUS_OPTIONS = [
   { value: "Pending", label: "Pending" },
@@ -21,9 +22,21 @@ export default function OrdersAdmin() {
   const { orders, updateOrderStatus } = useStore();
   const [tab, setTab] = useState<(typeof TABS)[number]>("All");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [slipOrder, setSlipOrder] = useState<Order | null>(null);
 
   const filtered = tab === "All" ? orders : orders.filter((o) => o.status === tab);
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+
+  const paginatedOrders = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tab, orders.length]);
 
   // Status updates handler
   const handleStatusChange = (orderId: string, status: OrderStatus) => {
@@ -90,7 +103,7 @@ export default function OrdersAdmin() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
-              {filtered.map((o) => (
+              {paginatedOrders.map((o) => (
                 <tr
                   key={o.id}
                   className="hover:bg-muted/20 transition-all duration-150 cursor-pointer"
@@ -121,22 +134,12 @@ export default function OrdersAdmin() {
                       <span className={cn(
                         "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border",
                         o.paymentMethod === "Card" && "bg-success/5 text-success border-success/15",
-                        o.paymentMethod === "Bank Transfer" && "bg-brand/5 text-brand border-brand/20",
                         o.paymentMethod === "COD" && "bg-slate-deep/5 text-slate-deep border-slate-deep/15",
                       )}>
                         {o.paymentMethod === "Card" && <CreditCard size={10} />}
-                        {o.paymentMethod === "Bank Transfer" && <Landmark size={10} />}
                         {o.paymentMethod === "COD" && <Truck size={10} />}
                         {o.paymentMethod}
                       </span>
-                      {o.paymentMethod === "Bank Transfer" && o.depositSlipUrl && (
-                        <button
-                          onClick={() => setSlipOrder(o)}
-                          className="text-[10px] font-bold text-brand hover:underline hover:text-brand-dark cursor-pointer mt-1 block"
-                        >
-                          View Deposited Slip Image
-                        </button>
-                      )}
                     </div>
                   </td>
                   <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
@@ -167,6 +170,13 @@ export default function OrdersAdmin() {
           <div className="p-16 text-center text-muted-foreground text-sm font-semibold">
             No orders found under this category filter.
           </div>
+        )}
+        {filtered.length > 0 && (
+          <DataTablePagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
 
@@ -218,14 +228,6 @@ export default function OrdersAdmin() {
                   content={
                     <div>
                       <div className="font-semibold text-foreground">{selectedOrder.paymentMethod}</div>
-                      {selectedOrder.paymentMethod === "Bank Transfer" && selectedOrder.depositSlipUrl && (
-                        <button
-                          onClick={() => setSlipOrder(selectedOrder)}
-                          className="text-xs font-bold text-brand hover:underline mt-1 block"
-                        >
-                          View Deposited Slip Image
-                        </button>
-                      )}
                     </div>
                   }
                 />
@@ -305,74 +307,6 @@ export default function OrdersAdmin() {
                   </button>
                 )}
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Bank Transfer Deposit Slip Preview Modal */}
-      <AnimatePresence>
-        {slipOrder && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSlipOrder(null)}
-              className="fixed inset-0 z-50 bg-slate-deep/70 backdrop-blur-md"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-background border border-border shadow-2xl p-6 rounded-2xl"
-            >
-              <div className="flex items-start justify-between gap-3 border-b border-border pb-3.5 mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">Deposited Bank Slip</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Uploaded by {slipOrder.customer} for Order {slipOrder.id}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSlipOrder(null)}
-                  className="grid h-9 w-9 place-items-center rounded-xl hover:bg-muted text-foreground transition"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* Deposit Slip Image View */}
-              <div className="relative border border-border rounded-xl overflow-hidden bg-muted/30 flex justify-center items-center p-2 max-h-[50vh]">
-                <img
-                  src={slipOrder.depositSlipUrl}
-                  alt="Deposit Slip Mockup"
-                  className="max-w-full max-h-[45vh] object-contain rounded-lg shadow-sm"
-                />
-              </div>
-
-              <div className="mt-4 flex gap-3.5 bg-muted/10 border border-border p-3.5 rounded-xl">
-                <Landmark size={18} className="text-brand shrink-0 mt-0.5" />
-                <div className="text-xs text-muted-foreground">
-                  <div className="font-bold text-foreground mb-0.5">Verification Instructions</div>
-                  Verify that the transaction reference and total amount of{" "}
-                  <strong className="text-brand">Rs. {(slipOrder.totalLKR || (slipOrder.total * 300)).toLocaleString()}</strong> are reflected in the 'Bank of Ceylon' vendor merchant account before changing status to 'Shipped'.
-                </div>
-              </div>
-
-              {slipOrder.status === "Pending" && (
-                <div className="mt-5 flex gap-3">
-                  <button
-                    onClick={() => {
-                      handleStatusChange(slipOrder.id, "Shipped");
-                      setSlipOrder(null);
-                    }}
-                    className="flex-1 rounded-xl bg-brand text-brand-foreground py-3 text-xs font-extrabold hover:bg-brand-dark shadow-glow"
-                  >
-                    Confirm Deposit & Ship Order
-                  </button>
-                </div>
-              )}
             </motion.div>
           </>
         )}

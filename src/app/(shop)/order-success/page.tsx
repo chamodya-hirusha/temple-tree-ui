@@ -62,12 +62,10 @@ function OrderSuccessContent() {
   const subtotalUSD = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const discountUSD = Math.max(0, subtotalUSD + shippingUSD - order.total);
 
-  const getPaymentText = (method: "Card" | "Bank Transfer" | "COD") => {
+  const getPaymentText = (method: "Card" | "COD") => {
     switch (method) {
       case "Card":
         return "Paid via Credit/Debit Card (Secure Stripe Settlement)";
-      case "Bank Transfer":
-        return "Direct Bank Deposit — Slip uploaded & pending verification";
       case "COD":
         return "Cash on Delivery — Payable in cash upon arrival";
       default:
@@ -184,7 +182,7 @@ function OrderSuccessContent() {
               </h3>
               <div className="rounded-2xl bg-muted/30 border border-border/80 p-4 space-y-1">
                 <div className="text-xs font-bold text-foreground">
-                  {order.paymentMethod === "COD" ? "Cash on Delivery (COD)" : order.paymentMethod === "Bank Transfer" ? "Bank Wire Transfer" : "Credit / Debit Card"}
+                  {order.paymentMethod === "COD" ? "Cash on Delivery (COD)" : "Credit / Debit Card"}
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-normal mt-1">
                   {getPaymentText(order.paymentMethod)}

@@ -237,10 +237,10 @@ export default function OrderTrackingPage() {
                     <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3"><CreditCard size={12} /> Payment Summary</h3>
                     <div className="rounded-2xl border border-border bg-muted/20 p-4 text-xs space-y-1">
                       <div className="font-bold text-foreground">
-                        {foundOrder.paymentMethod === "Card" ? "Credit / Debit Card" : foundOrder.paymentMethod === "Bank Transfer" ? "Bank Wire Transfer" : "Cash on Delivery (COD)"}
+                        {foundOrder.paymentMethod === "Card" ? "Credit / Debit Card" : "Cash on Delivery (COD)"}
                       </div>
                       <p className="text-[10px] text-muted-foreground">
-                        {foundOrder.paymentMethod === "Card" ? "Payment cleared and processed securely." : foundOrder.paymentMethod === "Bank Transfer" ? "Deposit verification complete." : "Cash collection pending delivery."}
+                        {foundOrder.paymentMethod === "Card" ? "Payment cleared and processed securely." : "Cash collection pending delivery."}
                       </p>
                     </div>
                   </div>

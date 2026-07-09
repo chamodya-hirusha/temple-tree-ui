@@ -5,6 +5,7 @@ import { Ticket, Plus, Save, X, Clock, HelpCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { CustomDropdown } from "@/components/CustomDropdown";
+import { DataTablePagination } from "@/components/admin/DataTablePagination";
 import { useStore, type Coupon } from "@/context/StoreContext";
 
 export default function CouponsAdminPage() {
@@ -24,6 +25,15 @@ export default function CouponsAdminPage() {
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(coupons.length / ITEMS_PER_PAGE);
+
+  const paginatedCoupons = coupons.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   // Force re-render of countdowns every second
   useEffect(() => {
@@ -157,7 +167,7 @@ export default function CouponsAdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
-              {coupons.map((c) => {
+              {paginatedCoupons.map((c) => {
                 const countdown = getTimeRemaining(c.expiresAt);
                 const isExpired = countdown === "Expired" || c.status === "expired";
 
@@ -219,6 +229,13 @@ export default function CouponsAdminPage() {
             </tbody>
           </table>
         </div>
+        {coupons.length > 0 && (
+          <DataTablePagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       {/* Coupon Modal Overlay */}
